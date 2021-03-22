@@ -170,7 +170,7 @@ Previous studies have looked at estimating the readability of a given text, thou
 
 \citet{shardlow2013comparison} tries a brute force approach where a simplification algorithm is applied to each word of a given text, deeming a world complex if simplified. However, this suffers from the assumption that a non-complex word does not require further simplification. Also attempted is the assignment of familiarity scores to each word, where a threshold that determining a word's complexity is tuned \citep{shardlow2013comparison}. We avoid thresholding in our study because we find it unnecessary, since raw familiarity scores can be used as features in regression-based tasks. 
 
-Results for the SemEval-2016 task \citep{zampieriEtAl:2017:NLPTEA} suggest that vote ensembling predictions of one's best performing models to be an effective strategy, while several top-performing models appear to use linguistic information beyond just word frequency \citep{paetzoldspecia2016sv000gg, ronzanoetal2016taln, mukherjeeetal2016ju}. Namely, they include lexical, semantic, syntactic, and psycholinguistic features. These findings inspire our use of ensemble techniques, as well us our consideration of phonological features as a new area of research. Results from SemEval-2018 show feature engineering-based models outperforming deep learning-based counterparts, despite the latter having generally better performances since SemEval-2016.
+Results for the SemEval-2016 task \citep{zampieriEtAl:2017:NLPTEA} suggest that vote ensembling predictions of one's best performing models to be an effective strategy, while several top-performing models appear to use linguistic information beyond just word frequency \citep{paetzoldspecia2016sv000gg, ronzanoetal2016taln, mukherjeeetal2016ju}; namely, they include lexical, semantic, syntactic, and psycholinguistic features. These findings inspire our use of ensemble techniques, as well us our consideration of phonological features as a new area of research. Results from SemEval-2018 show feature engineering-based models outperforming deep learning-based counterparts, despite the latter having generally better performances since SemEval-2016.
 
 \chapter{Data Collection}
 
@@ -181,7 +181,7 @@ Results for the SemEval-2016 task \citep{zampieriEtAl:2017:NLPTEA} suggest that 
   \begin{tabular}{l|l|r|r|r}
     \toprule
     \centering
-    Corpus & Subtask & Train &  Trial &  Test \\
+    \textbf{Corpus} & \textbf{Subtask} & \textbf{Train} &  \textbf{Trial} &  \textbf{Test} \\
     \midrule
     Bible & Single Word &   2574 &    143 &   283 \\
             & Multi Word &    505 &     29 &    66 \\
@@ -190,14 +190,14 @@ Results for the SemEval-2016 task \citep{zampieriEtAl:2017:NLPTEA} suggest that 
     Europarl & Single Word &   2512 &    143 &   345 \\
             & Multi Word &    498 &     37 &    65 \\
     \midrule
-    Total & Single Word & 7662 & 421 & 917 \\
+    \textbf{Total} & Single Word & 7662 & 421 & 917 \\
           & Multi Word &    1517 &     99 &    184 \\
     \bottomrule
   \end{tabular}
   \caption{\label{tab:datasets} LCP train, trial, and test sets.}
 \end{table}
 
-\citet{shardlow2020complex} present CompLex, a novel dataset in which each target expression (single word or MWE) is assigned a continuous label denoting its lexical complexity. Each label falls in range 0-1, a (normalized) average score given by employed crowd workers who report a given expression's difficulty on a 5-point Likert scale. We define a sample's \textit{class} as the bin to which its complexity label belongs (bins corresponding to Likert points). Target expressions in CompLex have 0.395 average complexity and 0.115 standard deviation, reflecting an imbalance in favor of class 2 and 3 samples.
+\citet{shardlow2020complex} present CompLex, a novel dataset in which each target expression (single word or MWE) is assigned a continuous label denoting its lexical complexity. Each label falls in range 0-1, a (normalized) average score given by employed crowd workers who report a given expression's difficulty on a 5-point Likert scale. Note that all crowd workers originate from English speaking countries (UK, USA, and Australia). We define a sample's \textit{class} as the bin to which its complexity label belongs (bins corresponding to Likert points). Target expressions in CompLex have 0.395 average complexity and 0.115 standard deviation, reflecting an imbalance in favor of class 2 and 3 samples.
 
 Each target expression is accompanied by the sentence it was extracted from, where certain target words appear multiple times in the dataset (in different contexts). A target expression is drawn from one of three corpora (Bible, Biomed, and Europarl) in an effort to motivate study of domain-specific linguistic features. As noted by \citet{shardlow2020complex}, Biomed samples appear to be on average 1.7 and 2.2 percent higher in lexical complexity than Bible and Europarl samples, respectively. This we believe may reflect the elevated diction exhibited in biomedical research and academic writing in general, a style of language that differs from typical colloquial dialogue used in biblical scripture or parliamentary debates. Although an annotator's predisposition to theology, academia, and/or politics may affect their labeling of samples in CompLex, this component is sadly beyond the scope of this study. A summary of train, trial,\footnote{In our study we avoid the trial set as we find it to be less representative of the training data, opting instead for training set cross-validation, stratified by corpus and complexity label.} and test set samples is given in Table \ref{tab:datasets}.
 
@@ -226,7 +226,7 @@ In this study, we use four additional corpora to extract term frequency-based fe
     \textbf{Europarl} & - & 0.0762 & 0.0698 & - \\
     \bottomrule
     \end{tabular}
-    \caption{\label{tab:baseline_systems} The results of linear regression with different baseline feature subsets. All results are reported in terms of mean absolute error (MAE). Note that \textbf{GloVe word+context} denotes the concatenation of 300-dim GloVe word and 300-dim GloVe context embeddings. A hyphen denotes an exceptionally high MAE.}
+    \caption{\label{tab:baseline_systems} The results of linear regression with different baseline feature subsets. All results are reported in terms of mean absolute error (MAE). Note that \textbf{GloVe word+context} denotes the concatenation of 300-dim GloVe word and 300-dim GloVe context embeddings. A hyphen `-' denotes an extremely high MAE.}
 \end{table}
 
 \begin{table}[]
@@ -263,13 +263,53 @@ In this study, we use four additional corpora to extract term frequency-based fe
     \end{minipage}
 \end{figure}
 
+\section{Assessing Baseline Systems}
+
 We focus initially on the single word subtask by experimenting with a baseline system inspired by that of the authors of CompLex \citep{shardlow2020complex}. Our goal in using this modified baseline system is to identify successful predictors, and to understand the shortcomings of said feature set, guiding the construction of BigGreen's own systems. The baseline system comprises a series of handcrafted features, GloVe word embeddings \citep{pennington2014glove}, GloVe context embeddings (kindly see Section \ref{paper:semantic_features} for more on this) and InferSent sentence embeddings \citep{conneau-EtAl:2017:EMNLP2017}. The handcrafted features include (1) target word frequency, courtesy of the wordfreq library \citep{robyn_speer_2018_1443582}, (2) word length, and (3) syllable count, courtesy of the Syllables library.\footnote{\url{https://github.com/prosegrinder/python-syllables}}. 
 
 As shown in Table \ref{tab:baseline_systems}, performances of variant baseline systems (a \textit{variant} being a fitting over some subset of the aforementioned features) show promise in the use of all handcrafted lexical features, and successes with certain semantic features (eg. GloVe word embeddings, but not InferSent sentence embeddings). 
 
-We manually assess training set samples that multiple variant baseline systems struggled with, samples that are perhaps naturally difficult to predict on; Table \ref{tab:samples} shows some of these. Observe that samples 6 and 7 bear target words that are acronyms, terms like \lq{RA}\rq and \lq{APP}\rq{} whose meanings are perhaps assumed to be common knowledge to academic audiences. Samples 2, 8, and 10 have target words that are proper nouns and adjectives, usually referring to domain-specific entities that cannot necessarily be understood via context clues (eg. samples 2 and 8 do not seem to explain \lq{Tou}\rq{} and \lq{Cre}\rq{} to a layman). Figures \ref{fig:is_acronym} and \ref{fig:is_proper} illustrate the effects of acronymity and propriety to perceived target word complexity.
+\section{Examining Challenging Samples}
+
+We manually assess training set samples that multiple variant baseline systems struggled with, samples that are perhaps naturally difficult to predict on; Table \ref{tab:samples} shows some of these. Observe that samples 6 and 7 bear target words that are acronyms, terms like \lq{RA}\rq and \lq{APP}\rq{} whose meanings are perhaps assumed to be common knowledge to academic audiences. Samples 2, 8, and 10 have target words that are proper nouns and adjectives, usually referring to domain-specific entities that cannot necessarily be learned from context clues (eg. samples 2 and 8 seem to expect the reader to know what \lq{Tou}\rq{} and \lq{Cre}\rq{} are). Figures \ref{fig:is_acronym} and \ref{fig:is_proper} illustrate the effects of acronymity and propriety to perceived target word complexity.
 
 Finally, we notice that target words used rarely in language (eg. Samples 1, 3, 4, and 9) need to be better considered by future systems. Moreover, we hypothesize that N-grams comprising a target word affect its perceived complexity; the target word in sample 5 is often used in the phrase \lq{\textbf{range} of,}\rq{} whereas the target word in sample 4 rarely ever arises in a niche noun phrase like \lq{contaminating donor \textbf{alleles}.}\rq{} 
+
+\section{Insight: Character Transition Probabilities}
+
+\begin{table}
+  \centering
+  \begin{tabular}{c|ccc|cc}
+    \toprule
+    \centering
+    & \multicolumn{3}{c|}{\textbf{Character Transition Probability}} &  &  \\
+    \textbf{Char. Transition} & \textbf{Gigaword-5} & \textbf{Class 1} & \textbf{Class 4, 5} & \textbf{T-Statistic} & \textbf{P-Value}  \\
+    \midrule
+    $i \rightarrow d$ & 0.0597 & 0.0331 &  0.0588 &    -7.3532 &  4.5127e-10 \\
+    $o \rightarrow s$ & 0.0402 & 0.0200 &  0.0976 &    -4.4796 &  2.7255e-05 \\
+    $o \rightarrow r$ & 0.1568 & 0.1233 &  0.1463 &    -2.1475 &  1.6440e-02 \\
+    $y \rightarrow c$ & 0.0129 & 0.0500 &  0.3333 &    -1.8898 &  5.8693e-02 \\
+    $p \rightarrow h$ & 0.0206 & 0.0156 &  0.4500 &    -1.5407 &  6.8241e-02 \\
+    $o \rightarrow n$ & 0.2079 & 0.2700 &  0.1707 &    -1.4155 &  7.8776e-02 \\
+    $i \rightarrow t$ & 0.1084 & 0.0783 &  0.2353 &    -1.4036 &  8.1026e-02 \\
+    $e \rightarrow s$ & 0.1255 & 0.2019 &  0.2143 &    -1.2893 &  9.8986e-02 \\
+    \bottomrule
+  \end{tabular}
+  \caption{\label{tab:top_char_transitions} Character transitions that are more frequent in higher complexity target words (at 10\% significance level). Note that no $y \rightarrow c$ transitions occur across class 3 samples.}
+\end{table}
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.55]{character_transition_probabilities.png}
+  \captionsetup{justification=centering}
+  \caption{\label{fig:character_transition_probabilities} Lowercase ASCII transition probabilities, estimated using Gigaword-5.}
+\end{figure}
+
+While prior top-performing approaches harness a variety of  linguistic information across lexical, semantic, syntactic, and psycholinguistic features \citep{paetzoldspecia2016sv000gg, ronzanoetal2016taln, mukherjeeetal2016ju}, there appears to be a lack of consideration of phonological features. \citet{doi10108000437956195011659381} suggests that the relative frequencies of phonemes can be used to potentially identify important phonemes to tutor foreign language students with who exhibit numerous phonemic difficulties. While we assume that each crowd annotator of CompLex understand at least one dialect of English, we also assume for convenience that they share similar literacy levels and general familiarity with the English language. We hypothesize that because certain English phonemes (ie. soundable segments or character n-grams) are evidently more common in usage than others \citep{doi10108000437956195011659381}, a target word's complexity could be impacted by an annotator's familiarity with its constituent phonemes.
+
+For a given target word $w$, consider the transition probability from character $w[i]$ to the character $w[i+1]$, that is, the expected probability of the $(i+1)$th character succeeding the $i$th character in language; we call this a \textit{character} transition probability. To understand whether this may be a useful feature for our task, for each target word $w$ of class $c$, we define the random variable ${}_xT_y \in \mathbb{N}$ as the number of occurences of character transition $x \rightarrow y$ in the target word, where $x, y \in \{\text{ASCII character set}\}$. For each possible transition $x \rightarrow y$, we ask whether the distribution of ${}_xT_y$ over class 1 samples (ie. very easy target words) is different from that over class 4, 5 samples (ie. difficult target words).\footnote{Here, we combine classes 4 and 5 because so few samples exist in each individual class.} Let $\mu_1$ and $\mu_{4,5}$ be the average number of occurences of the given transition $x \rightarrow y$ over  class 1 and class 4, 5 target words, respectively. We conduct an unpaired lower-tailed t-test using the null hypothesis that $H_0\text{: } \mu_1 = \mu_{4,5}$, and the alternative hypothesis that $H_a\text{: } \mu_1 < \mu_{4,5}$. Table \ref{tab:top_char_transitions} presents only the character transitions that yield statistically significant p-values at the 10\% confidence level, implying that these character transitions are slightly more common in higher complexity target words than in lower complexity target words. Note that we also conducted t-tests with instead the alternative hypothesis $H_a\text{: } \mu_1 > \mu_{4,5}$, finding that \textit{no} character transition yields a statistically significant p-value at the 10\% confidence level! 
+
+Perhaps we can intuit some of the character transitions in Table \ref{tab:top_char_transitions}. Notice that character transition probabilities estimated over target word classes lie roughly in the same ballpark as that estimated over the Gigaword-5 corpus; deviation from the Gigaword-5 estimates is somewhat expected considering the relatively small size of the CompLex corpus. Seven of the eight character transitions shown bear a higher transition probabilities over class 4, 5 samples compared to over class 1 samples (all except $o \rightarrow n$), perhaps suggesting that target word complexity is correlated with changes in the transition probabilities for particular characters. Based on Figure \ref{fig:character_transition_probabilities}, observe that $y$ often transitions to an $e$, $s$, $o$, etc. whereas rather rarely does it transition to $c$; yet, we find class 4, 5 samples tending to towards this rarity nonetheless, often showing up in scientific words with root `cycl' such as `cycle,' `cyclone,' and `doxycycline.' We observe even more instances of this apparent tendency towards rarer transitions, namely $i \rightarrow d$, $o \rightarrow s$, and $p \rightarrow h$. This subtle pattern suggests that the transition probabilities between characters (and possibly even phonemes) in a target word may serve as a discriminative feature for predicting lexical complexity.
 
 \chapter{BigGreen Systems \& Approaches}
 
@@ -321,7 +361,7 @@ These features are expressly included due to their expected importance, \citep{z
 These are features that assess the syntactic structure of the target word's context. We construct the constituency parse tree for each sentence using a Stanford CoreNLP pipeline \citep{manning-EtAl:2014:P14-5}.
 
 \begin{itemize}
-  \item \textbf{Part of speech (POS)}: a tag is predicted using NLTK's \texttt{pos\_tag} function \citep{Loper02nltk:the}.
+  \item \textbf{Part of speech (POS)}: predicted via NLTK's \texttt{pos\_tag} function \citep{Loper02nltk:the}.
   \item \textbf{Depth of parse tree}: the parse tree's height.
   \item \textbf{Depth of target word}: distance between the target word and parse tree's root node.
   \item \textbf{Is proper}: whether target word is a proper noun/adjective, detected via capitalization.
@@ -339,8 +379,8 @@ For the single word subtask, we select features using a combination of filter an
 
 \begin{figure}
   \centering
-  \includegraphics[scale=0.4]{mi.png}
-  \caption{\label{fig:mi} Performances of LR fitted on top-k features by mutual information (with 5-fold cross-validation).}
+  \includegraphics[scale=0.75]{mi.png}
+  \caption{\label{fig:mi} Performances of LR fitted (with 5-fold cross-validation) on top-k features by mutual information.}
 \end{figure}
 
 \begin{itemize}
