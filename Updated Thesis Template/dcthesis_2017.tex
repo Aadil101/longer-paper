@@ -419,7 +419,7 @@ Multi-Task Deep Neural Network (MT-DNN) proposed by \citet{liuetal2019multitask}
 
 \subsection{Input Layer}
 
-Data is fed to the model's input layer in \textit{PremiseAndOneHypothesis} format, premise and hypothesis being sentence and target word (or MWE), respectively. The data is preprocessed by a BERT Tokenizer, backed by HuggingFace \citep{wolf_etal_2020_transformers}.
+Data is fed to the model's input layer in \textit{PremiseAndOneHypothesis} format, premise and hypothesis being sentence and target word (or MWE), respectively. The data is preprocessed by a BERT Tokenizer, backed by Hugging Face \citep{wolf_etal_2020_transformers}.
 
 \subsection{Output Layer}
 
@@ -621,7 +621,7 @@ Here, we describe in greater detail the various features that were experimented 
     \hline 
     \texttt{tf\_lemma} & Term frequency of the lemmatized target word. Lemmatization is performed using NLTK's WordNet Lemmatizer.\\
     \hline 
-    \texttt{tf\_summed\_bpe} & Sum of the term frequencies of each BPE of the target word. BPE tokenization is performed using Huggingface's BERT Tokenizer.\\
+    \texttt{tf\_summed\_bpe} & Sum of the term frequencies of each BPE of the target word. BPE tokenization is performed using Hugging Face's BERT Tokenizer.\\
     \hline 
     \texttt{tf\_ngram\_2} & Sum of the term frequencies of each bigram in the context containing the target word.\\
     \hline 
