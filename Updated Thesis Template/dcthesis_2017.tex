@@ -133,9 +133,10 @@
 \addcontentsline{toc}{section}{Abstract}
 This paper describes systems submitted by team BigGreen to LCP 2021. We assemble a feature engineering-based model with a deep neural network model founded on BERT. The latter model contextualizes a target expression, given its sentence. While BERT is a strong model overall, the feature engineering-based model helps in extreme cases, eg. separating instances of easy and neutral difficulty. Our handcrafted features comprise a breadth of lexical, semantic, syntactic, and novel phonological measures. Additionally, visualizations of BERT attention maps offer insight into potential features that Transformers models may learn when fine-tuned for lexical complexity prediction. Our ensembled predictions score reasonably well for the single word subtask, and we demonstrate how they can be harnessed to perform well on the multi word expression subtask too.
 
-%\chapter*{Preface}
-%\addcontentsline{toc}{section}{Preface}
-%Preface and Acknowledgments go here!
+\chapter*{Acknowledgments}
+\addcontentsline{toc}{section}{Acknowledgments}
+
+I was fortunate to have been mentored by graduate student Weicheng Ma and Professor Soroush Vosoughi. I owe everything to their invaluable guidance and encouragement that inspired me this past year, which has motivated me to pursue future academic research. Finally, I thank the College's Research Information, Technology and Consulting (RITC) department for providing me computational resources necessary to complete my research.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Table of Contents
@@ -546,7 +547,7 @@ Avenues for improvement include better data aggregation, as the relative lack of
 
 \appendix
 
-\chapter{Features}
+\chapter{Feature Descriptions}
 
 Here, we describe in greater detail the various features that were experimented with for our feature engineering-based model. Note that while this discussion regards the single word subtask, for the MWE subtask we compute the same features but for each of the head and tail words, respectively.
 
