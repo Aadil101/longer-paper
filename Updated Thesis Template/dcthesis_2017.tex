@@ -53,6 +53,7 @@
 \usepackage{microtype}
 \usepackage{caption}
 \usepackage{tablefootnote}
+\usepackage{float}
 
 %\usepackage{mkindex} %Uncomment if you would like to have an index. Compiling with an index takes more work than compiling without one. You will have to look up how to use the index package.
 
@@ -200,7 +201,7 @@ Results for the SemEval-2016 task \citep{zampieriEtAl:2017:NLPTEA} suggest that 
 
 \citet{shardlow2020complex} present CompLex, a novel dataset in which each target expression (single word or MWE) is assigned a continuous label denoting its lexical complexity. Each label falls in range 0-1, a (normalized) average score given by employed crowd workers who report a given expression's difficulty on a 5-point Likert scale. Note that all crowd workers originate from English speaking countries (UK, USA, and Australia). We define a sample's \textit{class} as the bin to which its complexity label belongs (bins corresponding to Likert points). Target expressions in CompLex have 0.395 average complexity and 0.115 standard deviation, reflecting an imbalance in favor of class 2 and 3 samples.
 
-Each target expression is accompanied by the sentence it was extracted from, where certain target words appear multiple times in the dataset (in different contexts). A target expression is drawn from one of three corpora (Bible, Biomed, and Europarl) in an effort to motivate study of domain-specific linguistic features. As noted by \citet{shardlow2020complex}, Biomed samples appear to be on average 1.7 and 2.2 percent higher in lexical complexity than Bible and Europarl samples, respectively. This we believe may reflect the elevated diction exhibited in biomedical research and academic writing in general, a style of language that differs from typical colloquial dialogue used in biblical scripture or parliamentary debates. Although an annotator's predisposition to theology, academia, and/or politics may affect their labeling of samples in CompLex, this component is sadly beyond the scope of this study. A summary of train, trial,\footnote{In our study we avoid the trial set as we find it to be less representative of the training data, opting instead for training set cross-validation, stratified by corpus and complexity label.} and test set samples is given in Table \ref{tab:datasets}.
+Each target expression is accompanied by the sentence it was extracted from, where certain target words appear multiple times in the dataset (in different contexts). A target expression is drawn from one of three sources (Bible, Biomed, and Europarl) in an effort to motivate study of domain-specific linguistic features. As noted by \citet{shardlow2020complex}, Biomed samples appear to be on average 1.7 and 2.2 percent higher in lexical complexity than Bible and Europarl samples, respectively. This we believe may reflect the elevated diction exhibited in biomedical research and academic writing in general, a style of language that differs from typical colloquial dialogue used in biblical scripture or parliamentary debates. Although an annotator's predisposition to theology, academia, and/or politics may affect their labeling of samples in CompLex, this component is sadly beyond the scope of this study. A summary of train, trial,\footnote{In our study we avoid the trial set as we find it to be less representative of the training data, opting instead for training set cross-validation, stratified by corpus and complexity label.} and test set samples is given in Table \ref{tab:datasets}.
 
 \section{External Datasets}
 
@@ -365,7 +366,7 @@ These are features that assess the syntactic structure of the target word's cont
   \item \textbf{Part of speech (POS)}: predicted via NLTK's \texttt{pos\_tag} function \citep{Loper02nltk:the}.
   \item \textbf{Depth of parse tree}: the parse tree's height.
   \item \textbf{Depth of target word}: distance between the target word and parse tree's root node.
-  \item \textbf{Number of words at target depth}: number of words at the same depth in the parse tree as the target word.\\
+  \item \textbf{Number of words at target depth}: number of words at the same depth in the parse tree as the target word.
   \item \textbf{Is proper}: whether target word is a proper noun/adjective, detected via capitalization.
 \end{itemize}
 
@@ -546,47 +547,64 @@ Here, we describe in greater detail the various features that were experimented 
 
 \section{Lexical Features}
 
-\begin{table}
+\begin{table}[H]
   \centering
-  \begin{tabular}{>{\centering\arraybackslash}p{0.2\linewidth}>{\centering\arraybackslash}p{0.8\linewidth}}
-    \textbf{Feature} & \textbf{Description} \\ 
+  \begin{tabular}{>{\centering\arraybackslash}p{0.2\linewidth}>{\arraybackslash}p{0.7\linewidth}}
+    \hline \textbf{Feature} & \textbf{Description} \\ \hline 
     \texttt{word\_len} & Character length of the target word.\\
+    \hline 
     \texttt{num\_syllables} & Number of syllables in the target word, via the Syllables library.\\
-    \texttt{is\_acronynm} & Boolean for whether the target word is a sequence of capital letters.\\
+    \hline 
+    \texttt{is\_acronynm} & Boolean for whether the target word is all capital letters.\\
+    \hline 
   \end{tabular}
   \label{lexical_features}
 \end{table}
 
 \section{Semantic Features}
 
-\begin{table}
+\begin{table}[H]
   \centering
-  \begin{tabular}{>{\centering\arraybackslash}p{0.3\linewidth}>{\centering\arraybackslash}p{0.7\linewidth}}
-    \textbf{Feature} & \textbf{Description} \\ 
+  \begin{tabular}{>{\centering\arraybackslash}p{0.35\linewidth}>{\arraybackslash}p{0.6\linewidth}}
+    \hline \textbf{Feature} & \textbf{Description} \\ \hline  
     \texttt{num\_hyperyms} & Number of hyperyms associated with the target word. The target word is initially disambiguated using NLTK's implementation of the Lesk algorithm for Word Sense Disambiguation (WSD) \citep{10.1145318723.318728}, which finds the WordNet Synset with the highest number of overlapping words between the context and different definitions of each Synset.\\
+    \hline 
     \texttt{num\_hyponyms} & Number of hyponyms associated with the target word. Procedure for finding this is analogous to that for \texttt{num\_hyperyms}.\\
+    \hline 
     \texttt{glove\_word} & 300-dimension embedding trained on Wikipedia-2014 and Gigaword for each target word. The target word is lowercased for simplicity.\\
+    \hline 
     \texttt{elmo\_word} & 1024-dimension embedding train on the One Billion Word Benchmark corpus for each target word.\\
+    \hline 
     \texttt{glove\_context} & 300-dimension average of GloVe word embeddings (see \texttt{glove\_word}) for each word in the given context. Each word is lowercased for simplicity.\\
+    \hline 
     \texttt{infersent\_embeddings} & 4096-dimension InferSent embedding for the context.\\
+    \hline 
   \end{tabular}
   \label{semantic_features}
 \end{table}
 
 \section{Phonetic Features}
 
-\begin{table}
+\begin{table}[H]
   \centering
-  \begin{tabular}{>{\centering\arraybackslash}p{0.4\linewidth}>{\centering\arraybackslash}p{0.6\linewidth}}
-    \textbf{Feature} & \textbf{Description} \\ 
+  \begin{tabular}{>{\centering\arraybackslash}p{0.4\linewidth}>{\arraybackslash}p{0.5\linewidth}}
+    \hline \textbf{Feature} & \textbf{Description} \\ \hline
     \texttt{char\_transition\_min} & Minimum of the set of character transition probabilities for each character bigram in the target word. Ground truth character transition probabilities between any two English characters are estimated over the Gigaword corpus.\\
+    \hline 
     \texttt{char\_transition\_max} & Maximum of the set described above.\\
+    \hline 
     \texttt{char\_transition\_mean} & Mean of the set described above.\\
+    \hline 
     \texttt{char\_transition\_std} & Standard deviation of the set described above.\\
+    \hline 
     \texttt{phoneme\_transition\_min} & Minimum of the set of phoneme transition probabilities for each character bigram in the target word. Ground truth phoneme transition probabilities between any two phonemes are estimated over the Gigaword corpus. The phoneme set considered is that of the CMU Pronouncing Dictionary.\tablefootnote{\url{http://speech.cs.cmu.edu/cgi-bin/cmudict}}\\
+    \hline 
     \texttt{phoneme\_transition\_max} & Maximum of the set described above.\\
+    \hline 
     \texttt{phoneme\_transition\_mean} & Mean of the set described above.\\
+    \hline 
     \texttt{phoneme\_transition\_std} & Standard deviation of the set described above.\\
+    \hline
   \end{tabular}
   \label{phonetic_features}
 \end{table}
@@ -595,98 +613,152 @@ Here, we describe in greater detail the various features that were experimented 
 
 \subsection{Gigaword-based}
 
-\begin{table}
+\begin{table}[H]
   \centering
-  \begin{tabular}{>{\centering\arraybackslash}p{0.3\linewidth}>{\centering\arraybackslash}p{0.7\linewidth}}
-    \textbf{Feature} & \textbf{Description} \\ 
+  \begin{tabular}{>{\centering\arraybackslash}p{0.2\linewidth}>{\arraybackslash}p{0.7\linewidth}}
+    \hline \textbf{Feature} & \textbf{Description} \\ \hline
     \texttt{tf} & Term frequency of the target word. Note that all term frequency-based features are computed using the Scikit-learn library's \texttt{CountVectorizer} \citep{scikitlearn}.\\
+    \hline 
     \texttt{tf\_lemma} & Term frequency of the lemmatized target word. Lemmatization is performed using NLTK's WordNet Lemmatizer.\\
+    \hline 
     \texttt{tf\_summed\_bpe} & Sum of the term frequencies of each BPE of the target word. BPE tokenization is performed using Huggingface's BERT Tokenizer.\\
+    \hline 
     \texttt{tf\_ngram\_2} & Sum of the term frequencies of each bigram in the context containing the target word.\\
+    \hline 
     \texttt{tf\_ngram\_3} & Sum of the term frequencies of each trigram in the context containing the target word in the context.\\
+    \hline 
     \texttt{tfidf} & Term frequency-inverse document frequency.\\
+    \hline 
     \texttt{tfidf\_ngram\_2} & Sum of the term frequency-inverse document frequencies of each bigram in the context containing the target word.\\
+    \hline 
     \texttt{tfidf\_ngram\_3} & Sum of the term frequency-inverse document frequencies of each trigram in the context containing the target word.\\
+    \hline
   \end{tabular}
   \label{word_frequency_and_n_gram_features_gigaword_based}
 \end{table}
 
 \subsection{Google Ngram-based}
 
-\begin{table}
+\begin{table}[H]
   \centering
-  \begin{tabular}{>{\centering\arraybackslash}p{0.3\linewidth}>{\centering\arraybackslash}p{0.7\linewidth}}
-    \textbf{Feature} & \textbf{Description} \\ 
+  \begin{tabular}{>{\centering\arraybackslash}p{0.3\linewidth}>{\arraybackslash}p{0.6\linewidth}}
+    \hline \textbf{Feature} & \textbf{Description} \\ \hline 
     \texttt{google\_ngram\_1} & Term frequency of the target word.\\
+    \hline 
     \texttt{google\_ngram\_2\_head} & Term frequency of leading bigram in context containing the target word.\\
+    \hline 
     \texttt{google\_ngram\_2\_tail} & Term frequency of trailing bigram in context containing the target word.\\
+    \hline 
     \texttt{google\_ngram\_2\_min} & Minimum of the set of term frequencies of each bigram in context containing the target word.\\
+    \hline 
     \texttt{google\_ngram\_2\_max} & Maximum of the set described above.\\
+    \hline 
     \texttt{google\_ngram\_2\_mean} & Average of the set described above.\\
+    \hline 
     \texttt{google\_ngram\_2\_std} & Standard deviation of the set described above.\\
+    \hline 
     \texttt{google\_ngram\_3\_head} & Term frequency of leading trigram in context containing the target word.\\
+    \hline 
     \texttt{google\_ngram\_3\_mid} & Term frequency of middle trigram in context containing the target word.\\
+    \hline 
     \texttt{google\_ngram\_3\_tail} & Term frequency of trailing trigram in context containing the target word.\\
+    \hline 
     \texttt{google\_ngram\_3\_min} & Minimum of the set of term frequencies of each trigram in context containing the target word.\\
+    \hline 
     \texttt{google\_ngram\_3\_max} & Maximum of the set described above.\\
+    \hline 
     \texttt{google\_ngram\_3\_mean} & Average of the set described above.\\
+    \hline 
     \texttt{google\_ngrams\_3\_std} & Standard deviation of the set described above.\\
+    \hline 
   \end{tabular}
   \label{word_frequency_and_n_gram_features_google_ngram_based}
 \end{table}
 
 \subsection{SUBTLEXus-based}
 
-\begin{table}
+\begin{table}[H]
   \centering
-  \begin{tabular}{>{\centering\arraybackslash}p{0.3\linewidth}>{\centering\arraybackslash}p{0.7\linewidth}}
-    \textbf{Feature} & \textbf{Description} \\ 
+  \begin{tabular}{>{\centering\arraybackslash}p{0.2\linewidth}>{\arraybackslash}p{0.7\linewidth}}
+    \hline \textbf{Feature} & \textbf{Description} \\ \hline 
     \texttt{FREQcount} & Number of times the target word appears in corpus.\\
+    \hline 
     \texttt{CDcount} & Number of films in which the target word appears.\\
+    \hline 
     \texttt{FREQlow} & Number of times the lowercased target word appears in corpus.\\
+    \hline 
     \texttt{CDlow} & Number of films in which the lowercased target word appears.\\
+    \hline 
     \texttt{SUBTLWF} & Number of times the target word appears per million words.\\
+    \hline 
     \texttt{SUBTLCD} & Percentage of films in which the target word appears.\\
+    \hline 
   \end{tabular}
   \label{word_frequency_and_n_gram_features_SUBTLEXus_based}
 \end{table}
 
 \subsection{BNC-based}
 
-\begin{table}
+\begin{table}[H]
   \centering
-  \begin{tabular}{>{\centering\arraybackslash}p{0.3\linewidth}>{\centering\arraybackslash}p{0.7\linewidth}}
-    \textbf{Feature} & \textbf{Description} \\ 
+  \begin{tabular}{>{\centering\arraybackslash}p{0.3\linewidth}>{\arraybackslash}p{0.6\linewidth}}
+    \hline \textbf{Feature} & \textbf{Description} \\ \hline 
     \texttt{bnc\_frequency} & Term frequency of the target word.\\
+    \hline 
   \end{tabular}
   \label{word_frequency_and_n_gram_features_BNC_based}
 \end{table}
 
 \section{Syntactic Features}
 
-\begin{table}
+\begin{table}[H]
   \centering
-  \begin{tabular}{>{\centering\arraybackslash}p{0.3\linewidth}>{\centering\arraybackslash}p{0.7\linewidth}}
-    \textbf{Feature} & \textbf{Description} \\ 
-    \texttt{parse\_tree\_depth} & Height of the context's constituency parse tree. The tree is obtained using a Stanford CoreNLP pipeline.\\
+  \begin{tabular}{>{\centering\arraybackslash}p{0.45\linewidth}>{\arraybackslash}p{0.55\linewidth}}
+    \hline \textbf{Feature} & \textbf{Description} \\ \hline 
+    \texttt{parse\_tree\_depth} & Height of context's constituency parse tree. We get tree using Stanford CoreNLP pipeline.\\
+    \hline 
     \texttt{token\_depth} & Depth of the target word with respect to root node of the context's constituency parse tree.\\
+    \hline 
     \texttt{num\_words\_at\_depth} & Number of words at the depth of the target word in the context's constituency parse tree (see \texttt{token\_depth} above).\\
-    \texttt{is\_proper} & Boolean for whether the target word is a proper noun/adjective. This is detected simply based on capitalization.\\
-    \texttt{POS\_LS, POS\_TO, POS\_VBN, POS\_WP, POS\_UH, POS\_VBG, POS\_JJ, POS\_VBZ, POS\_VBP, POS\_NN, POS\_DT, POS\_PRP, POS\_WP\$, POS\_NNPS, POS\_PRP\$, POS\_WDT, POS\_RB, POS\_RBR, POS\_RBS, POS\_VBD, POS\_IN, POS\_FW, POS\_RP, POS\_JJR, POS\_JJS, POS\_PDT, POS\_MD, POS\_VB, POS\_WRB, POS\_NNP, POS\_EX, POS\_NNS, POS\_SYM, POS\_CC, POS\_CD, POS\_POS} & Booleans for whether the target word part-of-speech tag is such. Tags considered include those used in the Penn Treebank Project.\tablefootnote{\url{https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html}} Tags are estimated using NLTK's \texttt{pos\_tag} method.\\
+    \hline 
+    \texttt{is\_proper} & Boolean for whether the target word is a proper noun/adjective, based on capitalization.\\
+    \hline 
+    \texttt{POS\_\{CC, CD, DT, EX, FW, IN, JJ, JJR, JJS, LS, MD, NN, NNP, NNPS, NNS, PDT, POS, PRP, PRP\$, RB, RBR, RBS, RP, SYM, TO, UH, VB, VBD, VBG, VBN, VBP, VBZ, WDT, WP, WP\$, WRB\}} & Booleans for whether the target word's part-of-speech tag is such. Tags considered are those used in the Penn Treebank Project.\tablefootnote{\url{https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html}} Tags are estimated using NLTK's \texttt{pos\_tag} method.\\
+    \hline 
   \end{tabular}
   \label{syntactic_features}
 \end{table}
 
 \section{Readability Features}
 
-\begin{table}
+\begin{table}[H]
   \centering
-  \begin{tabular}{>{\centering\arraybackslash}p{0.5\linewidth}>{\centering\arraybackslash}p{0.5\linewidth}}
-  \textbf{Feature} & \textbf{Description} \\ 
-  \texttt{automated\_readability\_index, avg\_character\_per\_word, avg\_letter\_per\_word, avg\_syllables\_per\_word, char\_count, coleman\_liau\_index, crawford, fernandez\_huerta, flesch\_kincaid\_grade, flesch\_reading\_ease, gutierrez\_polini, letter\_count, lexicon\_count, linsear\_write\_formula, lix, polysyllabcount, reading\_time, rix, syllable\_count, szigriszt\_pazos, SMOGIndex, DaleChallIndex} & Majority of whom are readability metrics, these algorithms are applied using the Textstat library's implementations.\\
-    \end{tabular}
+  \begin{tabular}{>{\centering\arraybackslash}p{0.5\linewidth}>{\arraybackslash}p{0.4\linewidth}}
+    \hline \textbf{Feature} & \textbf{Description} \\ \hline 
+    \texttt{automated\_readability\_index, avg\_character\_per\_word, avg\_letter\_per\_word, avg\_syllables\_per\_word, char\_count, coleman\_liau\_index, crawford, fernandez\_huerta, flesch\_kincaid\_grade, flesch\_reading\_ease, gutierrez\_polini, letter\_count, lexicon\_count, linsear\_write\_formula, lix, polysyllabcount, reading\_time, rix, syllable\_count, szigriszt\_pazos, SMOGIndex, DaleChallIndex} & Algorithms applied using the Textstat library's implementations, most of whom are readability metrics.\\
+    \hline 
+  \end{tabular}
   \label{readability_features}
 \end{table}
+
+\section{Other Features}
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{>{\centering\arraybackslash}p{0.3\linewidth}>{\arraybackslash}p{0.6\linewidth}}
+    \hline \textbf{Feature} & \textbf{Description} \\ \hline 
+    \texttt{ppl} & Perplexity metric, as defined by the Hugging Face library.\tablefootnote{\url{https://huggingface.co/transformers/perplexity.html}} A pretrained GPT-2 model is used to obtain a log-likelihood for each token in the context, given its preceding tokens. A sliding-window approach is used to handle the large number of tokens in a context. The log-likelihoods are averaged, and finally exponentiated.\\
+    \hline 
+    \texttt{ppl\_aspect\_only} & Similar approach to that described above, where only log-likelihoods of tokens comprising the target word are averaged.\\
+    \hline 
+    \texttt{num\_OOV} & Number of words in the context that do not exist in the vocabulary of Gigaword.\\
+    \hline 
+    \texttt{corpus\_bible, corpus\_biomed, corpus\_europarl} & Booleans indicating the domain of the sample.\\
+    \hline 
+  \end{tabular}
+  \label{other_features}
+\end{table}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Backend of thesis (references and the like)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
