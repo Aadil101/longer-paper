@@ -452,9 +452,9 @@ We present performances of \texttt{BigGreen}'s system on each subtask in Tables 
     SVM (kernel=rbf, C=1, gamma=0.001) &	0.7392 & - &	0.7066 &	0.0668 \\
     KNN (k=20, weights=distance) &	0.7156 & -	& 0.6914 &	0.0710 \\
     \hline
-    XGBoost (\textit{full}) &	0.7589 & - &	0.7220 &	0.0645 \\
-    XGBoost (\textit{reduced}) &	0.7456 & - &	0.7157 &	0.0751 \\
-    XGBoost (\textit{full}+\textit{reduced}) & 0.7576 & - & 0.7220 & 0.0646 \\
+    XGBoost$_\textit{full}$ &	0.7589 & - &	0.7220 &	0.0645 \\
+    XGBoost$_\textit{reduced}$ &	0.7456 & - &	0.7157 &	0.0751 \\
+    XGBoost$_{\textit{full}+\textit{reduced}}$ & 0.7576 & - & 0.7220 & 0.0646 \\
     MT-DNN & 0.7484 & -	& 0.7044 & 0.0664 \\
     Ensemble (submission) & 0.7749 & 8 of 54 & 0.7294 & 0.0629 \\
     \hline
@@ -468,8 +468,8 @@ We present performances of \texttt{BigGreen}'s system on each subtask in Tables 
   \centering
   \begin{tabular}{lcccc}
     \hline \textbf{Model} & \textbf{Pearson} & \textbf{Rank} & \textbf{Spearman} & \textbf{MAE} \\ \hline
-    Head predicted complexity & 0.7164 & - & 0.7305 & 0.1281 \\
-    Tail predicted complexity & 0.7188 & - & 0.7416 & 0.1306 \\
+    XGBoost$_{\textit{full}+\textit{reduced}}(\text{head})$ & 0.7164 & - & 0.7305 & 0.1281 \\
+    XGBoost$_{\textit{full}+\textit{reduced}}(\text{tail})$ & 0.7188 & - & 0.7416 & 0.1306 \\
     MT-DNN & 0.7890 & - & 0.7649 & 0.0766 \\
     Ensemble (submission) & 0.7898 & 25 of 37 & 0.7769 & 0.0903 \\
     Ensemble (post-competition) & 0.8290 & *14 of 37 & 0.8120 & 0.0857 \\
@@ -487,7 +487,7 @@ We present performances of \texttt{BigGreen}'s system on each subtask in Tables 
 
 For feature selection, we find success in selecting the top-300 features by mutual information \textit{and} removing quasi-constant features. The pruned feature set is passed to both our wrapper/embedded methods and a variety of regressors for model comparison, where we find an XGBoost regressor \citep{DBLP:journals/corr/ChenG16} (with hyperparameters tuned using grid search) to excel consistently for the single word subtask. Performances are shown in Table \ref{tab:single-word-results}, where we rank in the top 15\% by Pearson. 
 
-For the MWE subtask, performances are reported in Table \ref{tab:multi-word-results}. Note that our submitted predictions differ from post-competition predictions. We \textit{previously} used a training procedure resembling that for the single word subtask: (1) filter methods for feature selection, (2) XGBoost for regression, (3) ensembling with MT-DNN. We hypothesize that the fewer number of training samples available for this subtask contributed to the prior procedure's lackluster performance. This inspired us to incorporate the predictive capabilities of our fitted single word subtask models, yielding superior results.
+For the MWE subtask, performances are reported in Table \ref{tab:multi-word-results}. Note that our submitted predictions differ from post-competition predictions. We \textit{previously} used a training procedure resembling that for the single word subtask: (1) filter methods for feature selection, (2) XGBoost for regression, (3) ensembling with MT-DNN. We passed the entire MWE as input to our XGBoost and MT-DNN models. We hypothesize that the fewer number of training samples available for this subtask contributed to the prior procedure's lackluster performance. This inspired us to incorporate the predictive capabilities of our fitted single word subtask models by applying them \textit{independently} on the MWE's constituent head and tail words. This gives us predicted complexities for the head and tail words each, which when ensembled with the predictions of our MT-DNN model (that, mind you, is trained on the \textit{entire} MWE) yields superior results to those submitted to competition.
 
 \section{Feature Contribution}
 
@@ -495,10 +495,10 @@ For the MWE subtask, performances are reported in Table \ref{tab:multi-word-resu
   \centering
   \includegraphics[scale=0.85]{xgboost_feature_importances.png}
   \captionsetup{justification=centering}
-  \caption{\label{fig:xgboost_feature_importance} Feature importances for XGBoost(\textit{full}).}
+  \caption{\label{fig:xgboost_feature_importance} Feature importances for XGBoost$_\textit{full}$.}
 \end{figure}
 
-In total we consider 110 features, in addition to our multidimensional embedding-based features and $\log$-transformed features. We inspect the estimated feature importance scores produced by the XGBoost(\textit{full}) model to find that term frequency-based features (eg. unigrams, bigrams, trigrams) are of overwhelming importance (see Figure \ref{fig:xgboost_feature_importance}). This raises concern over whether the MT-DNN model too relies on term frequencies to make \textit{its} predictions, and if not, the linguistic features it may have learned upon fine-tuning. Of the remaining features having non-zero feature importances, most appear to be dimensions of a target word-based semantic feature (ie. GloVe or ELMo embeddings).
+In total we consider 110 features, in addition to our multidimensional embedding-based features and $\log$-transformed features. We inspect the estimated feature importance scores produced by the XGBoost$_\textit{full}$ model to find that term frequency-based features (eg. unigrams, bigrams, trigrams) are of overwhelming importance (see Figure \ref{fig:xgboost_feature_importance}). This raises concern over whether the MT-DNN model too relies on term frequencies to make \textit{its} predictions, and if not, the linguistic features it may have learned upon fine-tuning. Of the remaining features having non-zero feature importances, most appear to be dimensions of a target word-based semantic feature (ie. GloVe or ELMo embeddings).
 
 \section{BERT Attention}
 \label{sec:bert_attention}
@@ -533,7 +533,7 @@ In total we consider 110 features, in addition to our multidimensional embedding
 
 Attention maps of Transformers have in previous works been assessed to demonstrate linguistic phenomena learned by specialized attention heads \citep{190509418, 190604341}, and to measure the relative contribution of each attention head to making task predictions \citep{190509418, 190510650}. We extract attention maps from MT-DNN's underlying fine-tuned BERT architecture. For each sample in the single word test set, we obtain an attention map from each of the BERT base model's 144 attention heads (ie. 12 heads per 12 layers).
 
-Based on the precedence given to term frequency features by the XGBoost(\textit{full}) model, we hypothesize that for certain attention heads, the degree to which BPEs attend to one another varies relative to the token's rarity in the lexicon. This follows the findings of \citealp{190509418}, who identify heads in which lesser frequent tokens are attended to semi-uniformly by a majority of sentence tokens. 
+Based on the precedence given to term frequency features by the XGBoost$_\textit{full}$ model, we hypothesize that for certain attention heads, the degree to which BPEs attend to one another varies relative to the token's rarity in the lexicon. This follows the findings of \citealp{190509418}, who identify heads in which lesser frequent tokens are attended to semi-uniformly by a majority of sentence tokens. 
 
 To test our hypothesis, we estimate for each attention head the Pearson correlation between word frequency and the average attention given to each word in the context.\footnote{We compute attention given to a \textit{word} as the sum of attention given to its constituent BPEs. We use the GBND corpus to extract word frequencies from, though any large corpora would suffice.} As illustrated in Figures \ref{fig:head_correlations_tf} and \ref{fig:head_3-9_tf_avg}, we find multiple attention heads appearing to specialize at directing attention towards the most or least frequent words (depending on sign of the correlation). Vertical stripe patterns like that in Figure \ref{fig:head_3-9} emerge as a result of attention originating from a spectrum of tokens. The findings seem to affirm the fundamental relevancy of word frequency to lexical complexity prediction, corroborating our intuitions.
 
@@ -577,13 +577,13 @@ Here, we describe in greater detail the various features that were experimented 
     \hline 
     \texttt{num\_hyponyms} & Number of hyponyms associated with the target word. Procedure for finding this is analogous to that for \texttt{num\_hyperyms}.\\
     \hline 
-    \texttt{glove\_word} & 300-dimension embedding trained on Wikipedia-2014 and Gigaword for each target word. The target word is lowercased for simplicity.\\
+    \texttt{glove\_word} & 300-dimension embedding for each target word, pre-trained on Wikipedia-2014 and Gigaword. The target word is lowercased for simplicity.\\
     \hline 
-    \texttt{elmo\_word} & 1024-dimension embedding train on the One Billion Word Benchmark corpus for each target word.\\
+    \texttt{elmo\_word} & 1024-dimension embedding for each target word, pre-trained on the One Billion Word Benchmark corpus.\\
     \hline 
     \texttt{glove\_context} & 300-dimension average of GloVe word embeddings (see \texttt{glove\_word}) for each word in the given context. Each word is lowercased for simplicity.\\
     \hline 
-    \texttt{infersent\_embeddings} & 4096-dimension InferSent embedding for the context.\\
+    \texttt{infersent\_embeddings} & 4096-dimension embedding for the context.\\
     \hline 
   \end{tabular}
   \label{semantic_features}
@@ -631,7 +631,7 @@ Here, we describe in greater detail the various features that were experimented 
     \hline 
     \texttt{tf\_ngram\_2} & Sum of the term frequencies of each bigram in the context containing the target word.\\
     \hline 
-    \texttt{tf\_ngram\_3} & Sum of the term frequencies of each trigram in the context containing the target word in the context.\\
+    \texttt{tf\_ngram\_3} & Sum of the term frequencies of each trigram in the context containing the target word.\\
     \hline 
     \texttt{tfidf} & Term frequency-inverse document frequency.\\
     \hline 
@@ -643,7 +643,7 @@ Here, we describe in greater detail the various features that were experimented 
   \label{word_frequency_and_n_gram_features_gigaword_based}
 \end{table}
 
-\subsection{Google Ngram-based}
+\subsection{Google N-gram-based}
 
 \begin{table}[H]
   \centering
@@ -753,7 +753,7 @@ Here, we describe in greater detail the various features that were experimented 
   \centering
   \begin{tabular}{>{\centering\arraybackslash}p{0.3\linewidth}>{\arraybackslash}p{0.6\linewidth}}
     \hline \textbf{Feature} & \textbf{Description} \\ \hline 
-    \texttt{ppl} & Perplexity metric, as defined by the Hugging Face library.\tablefootnote{\url{https://huggingface.co/transformers/perplexity.html}} A pretrained GPT-2 model is used to obtain a $\log$-likelihood for each token in the context, given its preceding tokens. A sliding-window approach is used to handle the large number of tokens in a context. The $\log$-likelihoods are averaged, and finally exponentiated.\\
+    \texttt{ppl} & Perplexity metric, as defined by the Hugging Face library.\tablefootnote{\url{https://huggingface.co/transformers/perplexity.html}} For each token in the context, we apply a pretrained GPT-2 model to estimate the $\log$-likelihood of the token occurring \textit{given its preceding tokens}. A sliding-window approach is used to handle the large number of tokens in a context. The $\log$-likelihoods are then averaged, and lastly exponentiated.\\
     \hline 
     \texttt{ppl\_aspect\_only} & Similar approach to that described above, where only $\log$-likelihoods of tokens comprising the target word are averaged.\\
     \hline 
@@ -764,6 +764,57 @@ Here, we describe in greater detail the various features that were experimented 
   \end{tabular}
   \label{other_features}
 \end{table}
+
+\chapter{Model Hyperparameters}
+
+Here we provide optimized hyperparameter settings that may help future developers with reproducing results, namely with training our models.
+
+\section{XGBoost}
+
+Below are tuned parameters used for all of our XGBoost models. Parameters not listed are given their default values as specified in XGBoost documentation\footnote{\url{https://xgboost.readthedocs.io/en/latest/}}:
+
+\indent \texttt{colsample\_bytree}: 0.7\\
+\indent \texttt{learning\_rate}: 0.03\\
+\indent \texttt{max\_depth}: 5\\
+\indent \texttt{min\_child\_weight}: 4\\
+\indent \texttt{n\_estimators}: 225\\
+\indent \texttt{nthread}: 4\\
+\indent \texttt{objective}: `reg:linear'\\
+\indent \texttt{silent}: 1\\
+\indent \texttt{subsample}: 0.7
+
+\section{MT-DNN}
+
+MT-DNN uses \texttt{yaml} as its config file format. Below are the contents of our task config file:
+
+\indent \texttt{data\_format}: PremiseAndOneHypothesis\\
+\indent \texttt{enable\_san}: false\\
+\indent \texttt{metric\_meta}:\\
+\indent - Pearson\\
+\indent - Spearman\\
+\indent \texttt{n\_class}: 1\\
+\indent \texttt{loss} MseCriterion\\
+\indent \texttt{kd\_loss}: MseCriterion\\
+\indent \texttt{adv\_loss}: MseCriterion\\
+\indent \texttt{task\_type}: Regression
+
+\section{Ensemble}
+
+Threshold above which a sample is assigned its \textit{reduced} prediction (ie. XGBoost$_\textit{reduced}$ prediction) instead of its \textit{full} prediction by (ie. XGBoost$_\textit{full}$ prediction): 0.59. Note this threshold is used to compute our XGBoost$
+_{\textit{full}+\textit{reduced}}$ prediction.
+
+\noindent \underline{Regarding weighted average ensemble (single word subtask)}:
+\begin{itemize}
+  \item Weight for XGBoost$_{\textit{full}+\textit{reduced}}$ prediction: 0.5
+  \item Weight for MT-DNN prediction: 0.5
+\end{itemize}
+
+\noindent \underline{Regarding weighted average ensemble (MWE subtask)}:
+\begin{itemize}
+  \item Weight for XGBoost$_{\textit{full}+\textit{reduced}}(\text{head})$: 0.28
+  \item Weight for XGBoost$_{\textit{full}+\textit{reduced}}(\text{tail})$: 0.17
+  \item Weight for MT-DNN prediction: 0.55
+\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Backend of thesis (references and the like)
