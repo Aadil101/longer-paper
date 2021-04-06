@@ -595,7 +595,7 @@ Here, we describe in greater detail the various features that were experimented 
   \centering
   \begin{tabular}{>{\centering\arraybackslash}p{0.4\linewidth}>{\arraybackslash}p{0.5\linewidth}}
     \hline \textbf{Feature} & \textbf{Description} \\ \hline
-    \texttt{char\_transition\_min} & Minimum of the set of character transition probabilities for each character bigram in the target word. Ground truth character transition probabilities between any two English characters are estimated over the Gigaword corpus.\\
+    \texttt{char\_transition\_min} & Minimum of the set of character transition probabilities for each character bigram in the target word. Ground truth character transition probabilities between any two English characters are estimated over Gigaword.\\
     \hline 
     \texttt{char\_transition\_max} & Maximum of the set described above.\\
     \hline 
@@ -725,7 +725,7 @@ Here, we describe in greater detail the various features that were experimented 
     \hline 
     \texttt{token\_depth} & Depth of the target word with respect to root node of the context's constituency parse tree.\\
     \hline 
-    \texttt{num\_words\_at\_depth} & Number of words at the depth of the target word in the context's constituency parse tree (see \texttt{token\_depth} above).\\
+    \texttt{num\_words\_at\_depth} & Number of words at the depth of the target word (see \texttt{token\_depth} above) in the context's constituency parse tree.\\
     \hline 
     \texttt{is\_proper} & Boolean for whether the target word is a proper noun/adjective, based on capitalization.\\
     \hline 
@@ -741,7 +741,7 @@ Here, we describe in greater detail the various features that were experimented 
   \centering
   \begin{tabular}{>{\centering\arraybackslash}p{0.5\linewidth}>{\arraybackslash}p{0.4\linewidth}}
     \hline \textbf{Feature} & \textbf{Description} \\ \hline 
-    \texttt{automated\_readability\_index, avg\_character\_per\_word, avg\_letter\_per\_word, avg\_syllables\_per\_word, char\_count, coleman\_liau\_index, crawford, fernandez\_huerta, flesch\_kincaid\_grade, flesch\_reading\_ease, gutierrez\_polini, letter\_count, lexicon\_count, linsear\_write\_formula, lix, polysyllabcount, reading\_time, rix, syllable\_count, szigriszt\_pazos, SMOGIndex, DaleChallIndex} & Algorithms applied using the Textstat library's implementations, most of whom are readability metrics.\\
+    \texttt{automated\_readability\_index, avg\_character\_per\_word, avg\_letter\_per\_word, avg\_syllables\_per\_word, char\_count, coleman\_liau\_index, crawford, fernandez\_huerta, flesch\_kincaid\_grade, flesch\_reading\_ease, gutierrez\_polini, letter\_count, lexicon\_count, linsear\_write\_formula, lix, polysyllabcount, reading\_time, rix, syllable\_count, szigriszt\_pazos, SMOGIndex, DaleChallIndex} & Algorithms applied using the Textstat library implementations, most of whom are readability metrics.\\
     \hline 
   \end{tabular}
   \label{readability_features}
@@ -753,13 +753,13 @@ Here, we describe in greater detail the various features that were experimented 
   \centering
   \begin{tabular}{>{\centering\arraybackslash}p{0.3\linewidth}>{\arraybackslash}p{0.6\linewidth}}
     \hline \textbf{Feature} & \textbf{Description} \\ \hline 
-    \texttt{ppl} & Perplexity metric, as defined by the Hugging Face library.\tablefootnote{\url{https://huggingface.co/transformers/perplexity.html}} For each token in the context, we apply a pretrained GPT-2 model to estimate the $\log$-likelihood of the token occurring \textit{given its preceding tokens}. A sliding-window approach is used to handle the large number of tokens in a context. The $\log$-likelihoods are then averaged, and lastly exponentiated.\\
+    \texttt{ppl} & Perplexity metric, as defined by the Hugging Face library.\tablefootnote{\url{https://huggingface.co/transformers/perplexity.html}} For each token in the context, we use a pretrained GPT-2 model to estimate the $\log$-likelihood of the token occurring \textit{given its preceding tokens}. A sliding-window approach is used to handle the large number of tokens in a context. The $\log$-likelihoods are averaged, and then exponentiated.\\
     \hline 
     \texttt{ppl\_aspect\_only} & Similar approach to that described above, where only $\log$-likelihoods of tokens comprising the target word are averaged.\\
     \hline 
     \texttt{num\_OOV} & Number of words in the context that do not exist in the vocabulary of Gigaword.\\
     \hline 
-    \texttt{corpus\_bible, corpus\_biomed, corpus\_europarl} & Booleans indicating the domain of the sample.\\
+    \texttt{corpus\_bible, corpus\_biomed, corpus\_europarl} & Booleans indicating the sample's domain.\\
     \hline 
   \end{tabular}
   \label{other_features}
@@ -793,14 +793,14 @@ MT-DNN uses \texttt{yaml} as its config file format. Below are the contents of o
 \indent - Pearson\\
 \indent - Spearman\\
 \indent \texttt{n\_class}: 1\\
-\indent \texttt{loss} MseCriterion\\
+\indent \texttt{loss}: MseCriterion\\
 \indent \texttt{kd\_loss}: MseCriterion\\
 \indent \texttt{adv\_loss}: MseCriterion\\
 \indent \texttt{task\_type}: Regression
 
 \section{Ensemble}
 
-Threshold above which a sample is assigned its \textit{reduced} prediction (ie. XGBoost$_\textit{reduced}$ prediction) instead of its \textit{full} prediction by (ie. XGBoost$_\textit{full}$ prediction): 0.59. Note this threshold is used to compute our XGBoost$
+Threshold above which a sample is assigned its \textit{reduced} prediction (ie. XGBoost$_\textit{reduced}$ prediction) instead of its \textit{full} prediction (ie. XGBoost$_\textit{full}$ prediction): 0.59. Note that this threshold is used to compute our XGBoost$
 _{\textit{full}+\textit{reduced}}$ prediction.
 
 \noindent \underline{Regarding weighted average ensemble (single word subtask)}:
