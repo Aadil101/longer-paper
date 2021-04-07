@@ -152,7 +152,7 @@
           & \@signatureline{\@examinera} \\
           & \@signatureline{\@examinerb} \\
           & \@signatureline{\@examinerc} \\
-          \multicolumn{2}{l}{\@longsignatureline{\@dean \par Dean of the Guarini School of Graduate and Advanced Studies}} \\
+          %\multicolumn{2}{l}{\@longsignatureline{\@dean \par Dean of the Guarini School of Graduate and Advanced Studies}} \\
         \end{tabular}
 			\end{center}
     \end{doublespace}
