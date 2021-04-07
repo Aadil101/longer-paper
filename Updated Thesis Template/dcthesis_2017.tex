@@ -556,13 +556,12 @@ Here, we describe in greater detail the various features that were experimented 
 \begin{table}[H]
   \centering
   \begin{tabular}{>{\centering\arraybackslash}p{0.2\linewidth}>{\arraybackslash}p{0.7\linewidth}}
-    \hline \textbf{Feature} & \textbf{Description} \\ \hline 
+    \textbf{Feature} & \textbf{Description} \\ \hline 
     \texttt{word\_len} & Character length of the target word.\\
     \hline 
     \texttt{num\_syllables} & Number of syllables in the target word, via the Syllables library.\\
     \hline 
     \texttt{is\_acronym} & Boolean for whether the target word is all capital letters.\\
-    \hline 
   \end{tabular}
   \label{lexical_features}
 \end{table}
@@ -572,7 +571,7 @@ Here, we describe in greater detail the various features that were experimented 
 \begin{table}[H]
   \centering
   \begin{tabular}{>{\centering\arraybackslash}p{0.35\linewidth}>{\arraybackslash}p{0.6\linewidth}}
-    \hline \textbf{Feature} & \textbf{Description} \\ \hline  
+    \textbf{Feature} & \textbf{Description} \\ \hline  
     \texttt{num\_hyperyms} & Number of hyperyms associated with the target word. The target word is initially disambiguated using NLTK's implementation of the Lesk algorithm for Word Sense Disambiguation (WSD) \citep{lesk1986automatic}, which finds the WordNet Synset with the highest number of overlapping words between the context and different definitions of each Synset.\\
     \hline 
     \texttt{num\_hyponyms} & Number of hyponyms associated with the target word. Procedure for finding this is analogous to that for \texttt{num\_hyperyms}.\\
@@ -584,7 +583,6 @@ Here, we describe in greater detail the various features that were experimented 
     \texttt{glove\_context} & 300-dimension average of GloVe word embeddings (see \texttt{glove\_word}) for each word in the given context. Each word is lowercased for simplicity.\\
     \hline 
     \texttt{infersent\_embeddings} & 4096-dimension embedding for the context.\\
-    \hline 
   \end{tabular}
   \label{semantic_features}
 \end{table}
@@ -594,7 +592,7 @@ Here, we describe in greater detail the various features that were experimented 
 \begin{table}[H]
   \centering
   \begin{tabular}{>{\centering\arraybackslash}p{0.4\linewidth}>{\arraybackslash}p{0.5\linewidth}}
-    \hline \textbf{Feature} & \textbf{Description} \\ \hline
+    \textbf{Feature} & \textbf{Description} \\ \hline
     \texttt{char\_transition\_min} & Minimum of the set of character transition probabilities for each character bigram in the target word. Ground truth character transition probabilities between any two English characters are estimated over Gigaword.\\
     \hline 
     \texttt{char\_transition\_max} & Maximum of the set described above.\\
@@ -610,7 +608,6 @@ Here, we describe in greater detail the various features that were experimented 
     \texttt{phoneme\_transition\_mean} & Mean of the set described above.\\
     \hline 
     \texttt{phoneme\_transition\_std} & Standard deviation of the set described above.\\
-    \hline
   \end{tabular}
   \label{phonetic_features}
 \end{table}
@@ -622,7 +619,7 @@ Here, we describe in greater detail the various features that were experimented 
 \begin{table}[H]
   \centering
   \begin{tabular}{>{\centering\arraybackslash}p{0.2\linewidth}>{\arraybackslash}p{0.7\linewidth}}
-    \hline \textbf{Feature} & \textbf{Description} \\ \hline
+    \textbf{Feature} & \textbf{Description} \\ \hline
     \texttt{tf} & Term frequency of the target word. Note that all term frequency-based features are computed using the Scikit-learn library's \texttt{CountVectorizer} \citep{pedregosa2011scikit}.\\
     \hline 
     \texttt{tf\_lemma} & Term frequency of the lemmatized target word. Lemmatization is performed using NLTK's WordNet Lemmatizer.\\
@@ -638,7 +635,6 @@ Here, we describe in greater detail the various features that were experimented 
     \texttt{tfidf\_ngram\_2} & Sum of the term frequency-inverse document frequencies of each bigram in the context containing the target word.\\
     \hline 
     \texttt{tfidf\_ngram\_3} & Sum of the term frequency-inverse document frequencies of each trigram in the context containing the target word.\\
-    \hline
   \end{tabular}
   \label{word_frequency_and_n_gram_features_gigaword_based}
 \end{table}
@@ -648,7 +644,7 @@ Here, we describe in greater detail the various features that were experimented 
 \begin{table}[H]
   \centering
   \begin{tabular}{>{\centering\arraybackslash}p{0.3\linewidth}>{\arraybackslash}p{0.6\linewidth}}
-    \hline \textbf{Feature} & \textbf{Description} \\ \hline 
+    \textbf{Feature} & \textbf{Description} \\ \hline 
     \texttt{google\_ngram\_1} & Term frequency of the target word.\\
     \hline 
     \texttt{google\_ngram\_2\_head} & Term frequency of leading bigram in context containing the target word.\\
@@ -676,7 +672,6 @@ Here, we describe in greater detail the various features that were experimented 
     \texttt{google\_ngram\_3\_mean} & Average of the set described above.\\
     \hline 
     \texttt{google\_ngrams\_3\_std} & Standard deviation of the set described above.\\
-    \hline 
   \end{tabular}
   \label{word_frequency_and_n_gram_features_google_ngram_based}
 \end{table}
@@ -686,7 +681,7 @@ Here, we describe in greater detail the various features that were experimented 
 \begin{table}[H]
   \centering
   \begin{tabular}{>{\centering\arraybackslash}p{0.2\linewidth}>{\arraybackslash}p{0.7\linewidth}}
-    \hline \textbf{Feature} & \textbf{Description} \\ \hline 
+    \textbf{Feature} & \textbf{Description} \\ \hline 
     \texttt{FREQcount} & Number of times the target word appears in corpus.\\
     \hline 
     \texttt{CDcount} & Number of films in which the target word appears.\\
@@ -698,7 +693,6 @@ Here, we describe in greater detail the various features that were experimented 
     \texttt{SUBTLWF} & Number of times the target word appears per million words.\\
     \hline 
     \texttt{SUBTLCD} & Percentage of films in which the target word appears.\\
-    \hline 
   \end{tabular}
   \label{word_frequency_and_n_gram_features_SUBTLEXus_based}
 \end{table}
@@ -708,9 +702,8 @@ Here, we describe in greater detail the various features that were experimented 
 \begin{table}[H]
   \centering
   \begin{tabular}{>{\centering\arraybackslash}p{0.3\linewidth}>{\arraybackslash}p{0.6\linewidth}}
-    \hline \textbf{Feature} & \textbf{Description} \\ \hline 
+    \textbf{Feature} & \textbf{Description} \\ \hline 
     \texttt{bnc\_frequency} & Term frequency of the target word.\\
-    \hline 
   \end{tabular}
   \label{word_frequency_and_n_gram_features_BNC_based}
 \end{table}
@@ -720,7 +713,7 @@ Here, we describe in greater detail the various features that were experimented 
 \begin{table}[H]
   \centering
   \begin{tabular}{>{\centering\arraybackslash}p{0.45\linewidth}>{\arraybackslash}p{0.55\linewidth}}
-    \hline \textbf{Feature} & \textbf{Description} \\ \hline 
+    \textbf{Feature} & \textbf{Description} \\ \hline 
     \texttt{parse\_tree\_depth} & Height of context's constituency parse tree. We get tree using Stanford CoreNLP pipeline.\\
     \hline 
     \texttt{token\_depth} & Depth of the target word with respect to root node of the context's constituency parse tree.\\
@@ -730,7 +723,6 @@ Here, we describe in greater detail the various features that were experimented 
     \texttt{is\_proper} & Boolean for whether the target word is a proper noun/adjective, based on capitalization.\\
     \hline 
     \texttt{POS\_\{CC, CD, DT, EX, FW, IN, JJ, JJR, JJS, LS, MD, NN, NNP, NNPS, NNS, PDT, POS, PRP, PRP\$, RB, RBR, RBS, RP, SYM, TO, UH, VB, VBD, VBG, VBN, VBP, VBZ, WDT, WP, WP\$, WRB\}} & Booleans for whether the target word's part-of-speech tag is such. Tags considered are those used in the Penn Treebank Project.\tablefootnote{\url{https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html}} Tags are estimated using NLTK's \texttt{pos\_tag} method.\\
-    \hline 
   \end{tabular}
   \label{syntactic_features}
 \end{table}
@@ -740,9 +732,8 @@ Here, we describe in greater detail the various features that were experimented 
 \begin{table}[H]
   \centering
   \begin{tabular}{>{\centering\arraybackslash}p{0.5\linewidth}>{\arraybackslash}p{0.4\linewidth}}
-    \hline \textbf{Feature} & \textbf{Description} \\ \hline 
+    \textbf{Feature} & \textbf{Description} \\ \hline 
     \texttt{automated\_readability\_index, avg\_character\_per\_word, avg\_letter\_per\_word, avg\_syllables\_per\_word, char\_count, coleman\_liau\_index, crawford, fernandez\_huerta, flesch\_kincaid\_grade, flesch\_reading\_ease, gutierrez\_polini, letter\_count, lexicon\_count, linsear\_write\_formula, lix, polysyllabcount, reading\_time, rix, syllable\_count, szigriszt\_pazos, SMOGIndex, DaleChallIndex} & Algorithms applied using the Textstat library implementations, most of whom are readability metrics.\\
-    \hline 
   \end{tabular}
   \label{readability_features}
 \end{table}
@@ -752,7 +743,7 @@ Here, we describe in greater detail the various features that were experimented 
 \begin{table}[H]
   \centering
   \begin{tabular}{>{\centering\arraybackslash}p{0.3\linewidth}>{\arraybackslash}p{0.6\linewidth}}
-    \hline \textbf{Feature} & \textbf{Description} \\ \hline 
+    \textbf{Feature} & \textbf{Description} \\ \hline 
     \texttt{ppl} & Perplexity metric, as defined by the Hugging Face library.\tablefootnote{\url{https://huggingface.co/transformers/perplexity.html}} For each token in the context, we use a pre-trained GPT-2 model to estimate the $\log$-likelihood of the token occurring \textit{given its preceding tokens}. A sliding-window approach is used to handle the large number of tokens in a context. The $\log$-likelihoods are averaged, and then exponentiated.\\
     \hline 
     \texttt{ppl\_aspect\_only} & Similar approach to that described above, where only $\log$-likelihoods of tokens comprising the target word are averaged.\\
@@ -760,7 +751,6 @@ Here, we describe in greater detail the various features that were experimented 
     \texttt{num\_OOV} & Number of words in the context that do not exist in the vocabulary of Gigaword.\\
     \hline 
     \texttt{corpus\_bible, corpus\_biomed, corpus\_europarl} & Booleans indicating the sample's domain.\\
-    \hline 
   \end{tabular}
   \label{other_features}
 \end{table}
