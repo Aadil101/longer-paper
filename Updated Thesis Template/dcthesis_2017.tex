@@ -124,6 +124,13 @@
 \maketitle
 \restoregeometry
 
+\chapter*{Acknowledgments}
+This past year, I was fortunate to have been guided by graduate student Weicheng Ma and Professor Soroush Vosoughi. I owe everything to their invaluable guidance and encouragement that inspired me over the past few semesters, which has motivated me to pursue future academic research. Given the ongoing pandemic that has transformed how we live our lives on campus and off, I'm thankful to have been able to conduct my research fully remotely. This would not have been possible without Weicheng and Professor Vosoughi's open arms, in addition to the educators at Dartmouth College's Departments of Computer Science and Mathematics who have made my undergraduate education possible. I sincerely could not have dreamed for a better situation. Finally, I'd like to thank Dartmouth College's Research Information, Technology and Consulting (RITC) department for providing me the computational resources necessary to complete my research. 
+
+\chapter*{Preface}
+\addcontentsline{toc}{section}{Preface}
+This paper serves as my senior thesis for the undergraduate major in Computer Science at Dartmouth College, as part of the requirements for the departmental Honors Program. It concludes two semesters of research from Fall 2020 to Winter 2021 during COSC 99 (Thesis Research). This paper differs from that which was published in proceedings of the 15th International Workshop on Semantic Evaluation (SemEval-2021) \citep{islam2021biggreen}. While the aforementioned is a brief system description paper summarizing my submission to the Lexical Complexity Prediction (LCP) shared task hosted at SemEval 2021 (Task 1), this paper particularly expands on data exploration that was conducted, describes the system's feature set in finer detail, while further analyzing and intuiting model performances. 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Abstract
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -131,12 +138,7 @@
 \chapter*{Abstract}
 %This is so the abstract appears in the ToC
 \addcontentsline{toc}{section}{Abstract}
-This paper describes a system submitted by team BigGreen to LCP 2021 for predicting the lexical complexity of English words in a given context. We assemble a feature engineering-based model with a deep neural network model founded on BERT. While BERT itself performs competitively, our feature engineering-based model helps in extreme cases, eg. separating instances of easy and neutral difficulty. Our handcrafted features comprise a breadth of lexical, semantic, syntactic, and novel phonological measures. Visualizations of BERT attention maps offer insight into potential features that Transformers models may learn when fine-tuned for lexical complexity prediction. Our ensembled predictions score reasonably well for the single word subtask, and we demonstrate how they can be harnessed to perform well on the multi word expression subtask too.
-
-\chapter*{Acknowledgments}
-\addcontentsline{toc}{section}{Acknowledgments}
-
-I was fortunate to have been guided by graduate student Weicheng Ma and Professor Soroush Vosoughi. I owe everything to their invaluable guidance and encouragement that inspired me this past year, which has motivated me to pursue future academic research. Finally, I thank the College's Research Information, Technology and Consulting (RITC) department for providing me computational resources necessary to complete my research.
+Tuning the complexity of one's writing is essential to presenting ideas in a logical, intuitive manner to particular audiences. This paper describes a system submitted by team BigGreen to LCP 2021 for predicting the lexical complexity of English words in a given context. We assemble a feature engineering-based model with a deep neural network model founded on BERT. While BERT itself performs competitively, our feature engineering-based model helps in extreme cases, eg. separating instances of easy and neutral difficulty. Our handcrafted features comprise a breadth of lexical, semantic, syntactic, and novel phonological measures. Visualizations of BERT attention maps offer insight into potential features that Transformers models implicitly learn when fine-tuned for the purposes of lexical complexity prediction. Our ensemble technique performs reasonably well in predicting the complexities of single words, and we demonstrate how such techniques can be harnessed to perform well when on multi word expressions too.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Table of Contents
@@ -173,9 +175,11 @@ In Sections 2 and 3 of this paper, we overview related work that inspires our ex
 
 Previous studies have looked at estimating the readability of a given text, though at the sentence-level rather than word-level. \citet{mc1969smog} regresses the number of polysyllabic words in a given lesson against the mean score for students quizzed on information pertaining to the lesson, yielding the SMOG Readability Formula. \citet{dale1948formula} offer a list of 768 (later updated to 3,000) words familiar to grade-school students in reading, which they find correlates with the relative difficulty of a given passage. An issue with traditional readability metrics seems to be the loss of generality at the word-level.
 
-\citet{shardlow2013comparison} tries a brute force approach where a simplification algorithm is applied to each word of a given text, deeming a word complex only if it is simplified. However, this suffers from the assumption that a non-complex word does not require further simplification. They also try assigning a familiarity score to a word, and determining whether the word is complex or not by applying a threshold. We avoid thresholding our features in this study as we find it unnecessary, since raw familiarity scores can be used as features in regression-based tasks. 
+\citet{shardlow2013comparison} tries a brute force approach where a simplification algorithm is applied to each word of a given text, deeming a word complex only if it is simplified. However, this suffers from the assumption that a non-complex word does not require further simplification. The author also tries assigning a familiarity score to the target word, and then determining whether the word is complex or not through the use of a threshold. We avoid thresholding our features in this study as we find it unnecessary, since raw familiarity scores can be used as features in regression-based tasks. 
 
-Results for the SemEval-2016 task \citep{zampieri2017complex} suggest that vote ensembling predictions of one's best performing models to be an effective strategy, while several top-performing models appear to use linguistic information beyond just word frequency \citep{paetzold2016sv000gg, ronzano2016taln, mukherjee2016ju_nlp}; they include lexical, semantic, syntactic, and psycholinguistic features. This inspires our use of ensemble techniques, as well us our consideration of phonological features as a new area of research. Results from SemEval-2018 show feature engineering-based models outperforming deep learning-based counterparts, despite the latter having generally better performances since SemEval-2016.
+Results for the SemEval-2016 task \citep{zampieri2017complex} suggest that vote ensembling predictions of one's best performing models to be an effective strategy, while several top-performing models appear to use linguistic information beyond just word frequency \citep{paetzold2016sv000gg, ronzano2016taln, mukherjee2016ju_nlp}; they include lexical, semantic, syntactic, and psycholinguistic features. This inspires our use of ensemble techniques, as well us our consideration of phonological features as a new area of research. Moreover, \citet{zampieri2017complex} emphasize the recurring effectiveness of Decision Trees and Random Forests across top performing models, perhaps due to the integrality of features across various distinct categories (eg. morphological, syntactic, etc.) as opposed to features that are generally of a same particular category. Note that the success of tree-based approaches is based on the metric G-score (which measures the harmonic mean between Accuracy and Recall). Interestingly, tree-based approaches tend to be outperformed by simpler threshold-based strategies based on F1-score; namely, \citet{wrobel2016plujagh} learns over word frequencies (computed over Wikipedia-2014) a threshold that maximizes F1-score over the CWI training dataset. Finally, evident is the underperformance of neural network and/or word embedding models in competition, which is potentially explained by the limited size of the training data.
+
+Results from the SemEval-2018 task \citep{yimam2018report} show progress in CWI research with regards to cross-lingual prediction, demonstrated by successful modeling of lexical complexity on a per-language basis by numerous systems. Surprisingly, this does \textit{not} require models necessarily be trained on data in the language of interest; training upon data available in one or more foreign languages is sufficient for predicting upon an `unseen' language, perhaps suggesting the universality of certain predictors of lexical complexity. Feature engineering-based systems appear to outperform competing deep learning-based systems, despite the latter having generally better performances since the CWI shared task 2016. 
 
 \chapter{Data Collection}
 
@@ -195,7 +199,7 @@ Results for the SemEval-2016 task \citep{zampieri2017complex} suggest that vote 
     Europarl & Single Word &   2512 &    143 &   345 \\
             & Multi Word &    498 &     37 &    65 \\
     \hline
-    \textbf{Total} & Single Word & 7662 & 421 & 917 \\
+    Total & Single Word & 7662 & 421 & 917 \\
           & Multi Word &    1517 &     99 &    184 \\
     \hline
   \end{tabular}
@@ -204,68 +208,86 @@ Results for the SemEval-2016 task \citep{zampieri2017complex} suggest that vote 
 
 \citet{shardlow2020complex} present CompLex, a novel dataset in which each target expression (a single word or two-token MWE) is assigned a continuous label denoting its lexical complexity. Each label falls in range 0-1, and represents the (normalized) average score given by employed crowd workers who report a given expression's difficulty on a 5-point Likert scale. Note that all crowd workers originate from English speaking countries (UK, USA, and Australia). We define a sample's \textit{class} as the bin to which its complexity label belongs, where bins are formed using the following mapping of complexity ranges: $[0,0.2) \rightarrow 1$, $[0.2, 0.4) \rightarrow 2$, $[0.4, 0.6) \rightarrow 3$, $[0.6, 0.8) \rightarrow 4$, $[0.8, 1] \rightarrow 5$. Target expressions in CompLex have 0.395 average complexity and 0.115 standard deviation, reflecting an imbalance in favor of class 2 and 3 samples.
 
-Each target expression is accompanied by the sentence it was extracted from, where certain target words appear multiple times in the dataset (in different contexts). A target expression is drawn from one of three sources (Bible, Biomed, and Europarl) in an effort to motivate study of domain-specific linguistic features. As noted by \citet{shardlow2020complex}, Biomed samples appear to be on average 1.7 and 2.2 percent higher in lexical complexity than Bible and Europarl samples, respectively. This we believe may reflect the elevated diction exhibited in biomedical research and academic writing in general, a style of language that differs from typical colloquial dialogue used in biblical scripture or parliamentary debates. Although an annotator's predisposition to theology, academia, and/or politics may affect their labeling of samples in CompLex, this component is sadly beyond the scope of this study. A summary of train, trial,\footnote{In our study we avoid the trial set as we find it to be less representative of the training data, opting instead for training set cross-validation (stratified by corpus and complexity label).} and test set samples is given in Table \ref{tab:datasets}.
+Each target expression is accompanied by the sentence it was extracted from, where certain target words appear multiple times in the dataset (in different contexts). A target expression is drawn from one of three sources (Bible, Biomed, and Europarl) in an effort to motivate study of domain-specific linguistic features. As noted by \citet{shardlow2020complex}, Biomed samples appear to be on average 1.7 and 2.2 percent higher in lexical complexity than Bible and Europarl samples, respectively. This we believe may reflect the elevated diction exhibited in biomedical research and academic writing in general, a style of language that differs from typical colloquial dialogue used in biblical scripture and parliamentary debate. Although an annotator's predisposition to theology, academia, and/or politics may affect their labeling of samples in CompLex, this component is sadly beyond the scope of this study. A summary of train, trial,\footnote{In our study we avoid the trial set as we find it to be less representative of the training data, opting instead for training set cross-validation (stratified by corpus and complexity label).} and test set samples is given in Table \ref{tab:datasets}.
 
 \section{External Datasets}
 
-In this study, we use four additional corpora to extract term frequency-based features for training our feature engineering-based model:
+\begin{table}
+  \centering
+  \begin{tabular}{c|c|c|c}
+    \hline
+    \centering
+    \textbf{Newswire} & \textbf{Files} & \textbf{Articles} & \textbf{Total Words} \\
+    \hline
+    AFE & 44 &   656269 & 170969  \\
+    APW & 91 &   1477466 & 539665\\
+    NYT & 96 &   1298498 & 914159 \\
+    XIE & 83 &   679007  & 131711\\
+    \hline
+    Total & 314 & 4111240 & 1756504\\
+    \hline
+  \end{tabular}
+  \caption{\label{tab:gigaword_breakdown} Breakdown of Gigaword articles by newswire. Note that for each newswire, articles are grouped together in specific files. Total Words denotes the total number of whitespace-separated tokens across all articles of a given newswire.}
+\end{table}
+
+In this study, we use four additional corpora to extract a breadth of term frequency-based features for training our feature engineering-based model on:
 
 \begin{itemize}
-  \item \textbf{English Gigaword Fifth Edition} (Gigaword): this comprises articles from seven prominent international English newswires, acquired by the Linguistic Data Consortium (LDC) \citep{parker2011english}.
-  \item \textbf{Google Books Ngrams, version 2} (GBND): this is used to count occurences of phrases across a corpus of books, accessed via the PhraseFinder API \citep{phrasefinder}.
-  \item \textbf{British National Corpus, version 3} (BNC): this is a 100 million word collection of British written and spoken English text \citep{bnc2007british}.
-  \item \textbf{SUBTLEXus}: this consists of American English subtitles totaling 51 million in words, whose creators offer a multitude of word frequency lists for \citep{brysbaert2009moving}.
+  \item \textbf{English Gigaword Fifth Edition} (Gigaword): this comprises articles from seven prominent international English newswires, acquired by the Linguistic Data Consortium (LDC) \citep{parker2011english}. Newswires include the Agence France Press English Service (AFE), Associated Press Worldstream English Service (APW), The New York Times Newswire Service (NYT), and The Xinhua News Agency English Service (XIE). Table \ref{tab:gigaword_breakdown} provides a breakdown of each newswire for convenience.
+  \item \textbf{Google Books Ngrams, version 2} (GBND): this is used to count occurences of phrases across a corpus of books, accessed via the PhraseFinder API \citep{phrasefinder}. The full corpus spans about 8 million books (ie. about 6\% of books ever published), and is constructed using improved OCR technology and metadata extraction compared to its prior version \citep{lin2012syntactic}.
+  \item \textbf{British National Corpus, version 3} (BNC): this is a 100 million word collection of British written and spoken English text \citep{bnc2007british}. Particularly intruiging is its consideration of spoken English text, for this may potentially account for intricacies of language in speech versus in writing.
+  \item \textbf{SUBTLEXus}: this comprises American English movie subtitles totaling 51 million in words. The creators of SUBTLEXus \citep{brysbaert2009moving} offer multiple ready-made word frequency lists; one list considers the number of movies containing a given word, whereas another measures how many times the word occurs specifically in its lowercase form. Please see Appendix \ref{appendix:SUBTLEXus} for further details.
 \end{itemize}
 
 \chapter{Data Exploration}
 
 \begin{table}
-    \centering
-    \begin{tabular}{l|c|c|c|c}
-    \hline
-     & \textbf{All} & \textbf{Handcrafted} & \textbf{GloVe word+context} & \textbf{InferSent} \\
-    \hline
-    \textbf{All} & 0.1399 & 0.0964 & 0.0749 & 0.1585 \\
-    \textbf{Bible} & 0.1133 & 0.0986 & 0.0884 & - \\
-    \textbf{Biomed} & - & 0.1094 & 0.0852 & 0.2060 \\
-    \textbf{Europarl} & - & 0.0762 & 0.0698 & - \\
-    \hline
-    \end{tabular}
-    \caption{\label{tab:baseline_models} The results of linear regression with different baseline feature subsets. All results are reported in terms of mean absolute error (MAE). Note that \textbf{GloVe word+context} denotes the concatenation of 300-dim GloVe word and 300-dim GloVe context embeddings. A hyphen `-' denotes an extremely high MAE.}
+  \centering
+  \begin{tabular}{l|c|c|c|c}
+  \hline
+    & \textbf{All} & \textbf{Handcrafted} & \textbf{GloVe word+context} & \textbf{InferSent} \\
+  \hline
+  \textbf{All} & 0.1399 & 0.0964 & 0.0749 & 0.1585 \\
+  \textbf{Bible} & 0.1133 & 0.0986 & 0.0884 & - \\
+  \textbf{Biomed} & - & 0.1094 & 0.0852 & 0.2060 \\
+  \textbf{Europarl} & - & 0.0762 & 0.0698 & - \\
+  \hline
+  \end{tabular}
+  \caption{\label{tab:baseline_models} The results of linear regression with different baseline feature subsets. All results are reported in terms of mean absolute error (MAE). Note that \textbf{GloVe word+context} denotes the concatenation of 300-dim GloVe word and 300-dim GloVe context embeddings. A hyphen `-' denotes an extremely high MAE.}
 \end{table}
 
 \begin{table}[]
-    \centering
-    \begin{tabular}{ccp{0.6\linewidth}cl}
-    \hline
-    \multicolumn{1}{c}{\textbf{ID}} & \multicolumn{1}{c}{\textbf{Corpus}} & \multicolumn{1}{c}{\textbf{Context}} & \textbf{Complexity} &  \\
-    \hline
-    1 & Bible & Now God made Daniel to find kindness and compassion in the sight of the prince of the \textbf{eunuchs}. & 0.632 &  \\
-    2 & Bible & he sent Hadoram his son to king David, to Greet him, and to bless him, because he had fought against Hadadezer and struck him; (for Hadadezer had wars with \textbf{Tou};) and he had with him all kinds of vessels of gold and silver and brass. & 0.825 &  \\
-    3 & Biomed & During budding morphogenesis, intersecting signaling networks from the epithelium and mesenchyme govern transcriptional, adhesive, polarity, and \textbf{motility} programs in these select groups of cells. & 0.714 &  \\
-    4 & Biomed & Future fine mapping experiments can be designed to randomize the influences of any contaminating donor \textbf{alleles} and environmental differences, as well as test for maternal genotype effects. & 0.625 &  \\
-    5 & Biomed & In the development of the mammalian retina, a diverse \textbf{range} of cell types is generated from a pool of multipotent retinal progenitor cells. & 0.050 &  \\
-    6 & Biomed & In the mouse model of \textbf{RA}, small genetic contributions are also often observed. & 0.813 &  \\
-    7 & Biomed & As in our tet-off \textbf{APP} mice, SantaCruz et al. found that tau neurofibrillary tangles, like amyloid plaques, are not cleared efficiently following transgene suppression. & 0.692 &  \\
-    8 & Biomed & These mice were mated with a strain carrying \textbf{Cre} recombinase under the control of the human Keratin 14 (K14) promoter, which is active in basal cells of epidermis and other stratified epithelia. & 0.783 &  \\
-    9 & Europarl & Once there is a statute based on equality, Madam President, the rules for travel and \textbf{subsistence} expenses can also be changed. & 0.486 &  \\
-    10 & Europarl & Mobilisation of the European \textbf{Globalisation} Adjustment Fund: Ireland - SR Technics ( & 0.611 & \\
-    \hline
-    \end{tabular}
-    \caption{\label{tab:samples} Ten of the top-50 samples predicted with large error margins (MAE) by multiple variant baseline models. Each sample's target word is bolded.}
+  \centering
+  \begin{tabular}{ccp{0.6\linewidth}cl}
+  \hline
+  \multicolumn{1}{c}{\textbf{ID}} & \multicolumn{1}{c}{\textbf{Corpus}} & \multicolumn{1}{c}{\textbf{Context}} & \textbf{Complexity} &  \\
+  \hline
+  1 & Bible & Now God made Daniel to find kindness and compassion in the sight of the prince of the \textbf{eunuchs}. & 0.632 &  \\
+  2 & Bible & he sent Hadoram his son to king David, to Greet him, and to bless him, because he had fought against Hadadezer and struck him; (for Hadadezer had wars with \textbf{Tou};) and he had with him all kinds of vessels of gold and silver and brass. & 0.825 &  \\
+  3 & Biomed & During budding morphogenesis, intersecting signaling networks from the epithelium and mesenchyme govern transcriptional, adhesive, polarity, and \textbf{motility} programs in these select groups of cells. & 0.714 &  \\
+  4 & Biomed & Future fine mapping experiments can be designed to randomize the influences of any contaminating donor \textbf{alleles} and environmental differences, as well as test for maternal genotype effects. & 0.625 &  \\
+  5 & Biomed & In the development of the mammalian retina, a diverse \textbf{range} of cell types is generated from a pool of multipotent retinal progenitor cells. & 0.050 &  \\
+  6 & Biomed & In the mouse model of \textbf{RA}, small genetic contributions are also often observed. & 0.813 &  \\
+  7 & Biomed & As in our tet-off \textbf{APP} mice, SantaCruz et al. found that tau neurofibrillary tangles, like amyloid plaques, are not cleared efficiently following transgene suppression. & 0.692 &  \\
+  8 & Biomed & These mice were mated with a strain carrying \textbf{Cre} recombinase under the control of the human Keratin 14 (K14) promoter, which is active in basal cells of epidermis and other stratified epithelia. & 0.783 &  \\
+  9 & Europarl & Once there is a statute based on equality, Madam President, the rules for travel and \textbf{subsistence} expenses can also be changed. & 0.486 &  \\
+  10 & Europarl & Mobilisation of the European \textbf{Globalisation} Adjustment Fund: Ireland - SR Technics ( & 0.611 & \\
+  \hline
+  \end{tabular}
+  \caption{\label{tab:samples} Ten of the top-50 samples predicted with large error margins (MAE) by multiple variant baseline models. Each sample's target word is bolded.}
 \end{table}
 
 \begin{figure}
-    \centering
-    \begin{minipage}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{is_acronym.png}
-        \caption{\label{fig:is_acronym} Probability density functions for acronym vs. non-acronym target words in single word training set.}
-    \end{minipage}
-    \hfill
-    \begin{minipage}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{is_proper.png}
-        \caption{\label{fig:is_proper} Probability density functions for proper vs. improper noun/adjective target words in single word training set.}
-    \end{minipage}
+  \centering
+  \begin{minipage}[b]{0.45\textwidth}
+      \includegraphics[width=\textwidth]{is_acronym.png}
+      \caption{\label{fig:is_acronym} Probability density functions for acronym vs. non-acronym target words in single word training set.}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.45\textwidth}
+      \includegraphics[width=\textwidth]{is_proper.png}
+      \caption{\label{fig:is_proper} Probability density functions for proper vs. improper noun/adjective target words in single word training set.}
+  \end{minipage}
 \end{figure}
 
 \section{Assessing Baseline Models}
@@ -314,7 +336,7 @@ While prior top-performing approaches harness a variety of linguistic informatio
 
 For a given target word $w$, consider the transition probability from character $w[i]$ to the character $w[i+1]$, that is, the expected probability of the $(i+1)$th character succeeding the $i$th character in language; we call this a \textit{character} transition probability. To understand whether this may be a useful feature for our task, for each target word $w$ of class $c$, we define the random variable ${}_xT_y \in \mathbb{N}$ as the number of occurences of character transition $x \rightarrow y$ in the target word, where $x, y \in \{\text{ASCII character set}\}$. For each possible transition $x \rightarrow y$, we ask whether the distribution of ${}_xT_y$ over class 1 samples (ie. very easy target words) is different from that over class 4, 5 samples (ie. difficult target words).\footnote{Here, we combine classes 4 and 5 because so few samples exist in each individual class.} Let $\mu_1$ and $\mu_{4,5}$ be the average number of occurences of the given transition $x \rightarrow y$ over  class 1 and class 4, 5 target words, respectively. We conduct an unpaired lower-tailed t-test using the null hypothesis that $H_0\text{: } \mu_1 = \mu_{4,5}$, and the alternative hypothesis that $H_a\text{: } \mu_1 < \mu_{4,5}$. Table \ref{tab:top_char_transitions} presents only the character transitions that yield statistically significant p-values at the 10\% confidence level, implying that these character transitions are slightly more common in higher complexity target words than in lower complexity target words. Note that we also conducted t-tests with instead the alternative hypothesis $H_a\text{: } \mu_1 > \mu_{4,5}$, finding that \textit{no} character transition yields a statistically significant p-value at the 10\% confidence level! 
 
-Perhaps we can intuit some of the character transitions in Table \ref{tab:top_char_transitions}. Notice that character transition probabilities estimated over target word classes lie roughly in the same ballpark as that estimated over the Gigaword corpus; deviation from the Gigaword estimates is somewhat expected considering the relatively small size of the CompLex corpus. Seven of the eight character transitions shown bear higher transition probabilities over class 4, 5 samples compared to over class 1 samples (all except $o \rightarrow n$), perhaps suggesting that target word complexity is correlated with changes in the transition probabilities for particular characters. Based on Figure \ref{fig:character_transition_probabilities}, observe that $y$ often transitions to an $e$, $s$, $o$, etc. whereas rather rarely does it transition to $c$; yet, we find class 4, 5 samples tending to towards this rarity nonetheless, often showing up in scientific words with root `cycl' such as `cycle,' `cyclone,' and `doxycycline.' We observe even more instances of this apparent tendency towards rarer transitions, namely $i \rightarrow d$, $o \rightarrow s$, and $p \rightarrow h$. This subtle pattern suggests that the transition probabilities between characters (and possibly even phonemes) in a target word could serve as a discriminative feature for predicting lexical complexity.
+Perhaps we can intuit some of the character transitions in Table \ref{tab:top_char_transitions}. Notice that character transition probabilities estimated over target word classes lie roughly in the same ballpark as that estimated over the Gigaword corpus; deviation from the Gigaword estimates is somewhat expected considering the relatively small size of the CompLex corpus. Seven of the eight character transitions shown (all except $o \rightarrow n$) bear higher transition probabilities over class 4, 5 samples compared to over class 1 samples, perhaps suggesting that target word complexity is correlated with changes in the transition probabilities for particular characters. Based on Figure \ref{fig:character_transition_probabilities}, observe that $y$ often transitions to an $e$, $s$, $o$, etc. whereas rather rarely does it transition to $c$; yet, we find class 4, 5 samples tending to towards this rarity nonetheless, often showing up in scientific words with root `cycl' such as `cycle,' `cyclone,' and `doxycycline.' We observe even more instances of this apparent tendency towards rarer transitions, namely $i \rightarrow d$, $o \rightarrow s$, and $p \rightarrow h$. This subtle pattern suggests that the transition probabilities between characters (and possibly even phonemes) in a target word could serve as a discriminative feature for predicting lexical complexity.
 
 \chapter{BigGreen System \& Approaches}
 
@@ -359,7 +381,7 @@ These features compute the likelihood that soundable portions of the target word
 
 \subsubsection{Word Frequency \& N-gram Features}
 
-These features are expressly included due to their expected importance as features \citep{zampieri2017complex}. Gigaword is the main corpus from which we extract word frequency measures (for both lemmatized and unlemmatized versions of the target word), the summed frequency of a target word's byte pair encodings (BPEs), as well as summed frequencies of bigrams and trigrams containing the target word. We complement these features with their IDF-based analogues. Finally, we use the GBND, BNC, and SUBTLEXus corpora to extract secondary word frequency, bigram, and trigram measures. 
+These features are expressly included due to their expected importance as features \citep{zampieri2017complex}. Gigaword is the main corpus from which we extract word frequency measures (for both lemmatized and unlemmatized versions of the target word), the summed frequency of a target word's byte pair encodings (BPEs), as well as summed frequencies of bigrams and trigrams containing the target word. We complement these features with their IDF-based analogues. Finally, we use the GBND, BNC, and SUBTLEXus corpora to extract secondary unigram, bigram, and trigram measures. 
 
 \subsubsection{Syntactic Features}
 
@@ -678,6 +700,7 @@ Here, we describe in greater detail the various features that were experimented 
 \end{table}
 
 \subsection{SUBTLEXus-based}
+\label{appendix:SUBTLEXus}
 
 \begin{table}[H]
   \centering
