@@ -71,6 +71,8 @@
 %  caps. It also removes the chapter numbers  
 \renewcommand{\chaptermark}[1]{\markboth{{\sc #1}}{{\sc #1}}}
 \renewcommand{\sectionmark}[1]{\markright{{\sc \thesection\ #1}}}
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
 %  These commands have lowercase headings with chapter numbers. 
 %\renewcommand{\chaptermark}[1]{markboth{#1}{}}
 %\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}} 
@@ -125,7 +127,7 @@
 \restoregeometry
 
 \chapter*{Acknowledgments}
-This past year, I was fortunate to have been guided by graduate student Weicheng Ma and Professor Soroush Vosoughi. I owe everything to their invaluable guidance and encouragement that inspired me over the past few semesters, which has motivated me to pursue future academic research. Given the ongoing pandemic that has transformed how we live our lives on campus and off, I'm thankful to have been able to conduct my research fully remotely. This would not have been possible without Weicheng and Professor Vosoughi's open arms, in addition to the educators at Dartmouth College's Departments of Computer Science and Mathematics who have made my undergraduate education possible. I sincerely could not have dreamed for a better situation. Finally, I'd like to thank Dartmouth College's Research Information, Technology and Consulting (RITC) department for providing me the computational resources necessary to complete my research. 
+This past year, I was fortunate to have been guided by graduate student Weicheng Ma and Professor Soroush Vosoughi. I owe everything to their invaluable guidance and encouragement that inspired me over the past few semesters, which has motivated me to pursue future academic research. Given the ongoing pandemic that has transformed how we live our lives on campus and off, I'm thankful to have been able to conduct my research fully remotely. This would not have been possible without Weicheng and Professor Vosoughi's open arms, in addition to all the educators at Dartmouth College's Departments of Computer Science and Mathematics who have made my undergraduate education possible. I sincerely could not have dreamed for a better situation. Finally, I'd like to thank Dartmouth College's Research Information, Technology and Consulting (RITC) department for providing me the computational resources necessary to complete my research. 
 
 \chapter*{Preface}
 \addcontentsline{toc}{section}{Preface}
@@ -138,7 +140,7 @@ This paper serves as my senior thesis for the undergraduate major in Computer Sc
 \chapter*{Abstract}
 %This is so the abstract appears in the ToC
 \addcontentsline{toc}{section}{Abstract}
-Tuning the complexity of one's writing is essential to presenting ideas in a logical, intuitive manner to particular audiences. This paper describes a system submitted by team BigGreen to LCP 2021 for predicting the lexical complexity of English words in a given context. We assemble a feature engineering-based model with a deep neural network model founded on BERT. While BERT itself performs competitively, our feature engineering-based model helps in extreme cases, eg. separating instances of easy and neutral difficulty. Our handcrafted features comprise a breadth of lexical, semantic, syntactic, and novel phonological measures. Visualizations of BERT attention maps offer insight into potential features that Transformers models implicitly learn when fine-tuned for the purposes of lexical complexity prediction. Our ensemble technique performs reasonably well in predicting the complexities of single words, and we demonstrate how such techniques can be harnessed to perform well when on multi word expressions too.
+Tuning the complexity of one's writing is essential to presenting ideas in a logical, intuitive manner to particular audiences. This paper describes a system submitted by team \texttt{BigGreen} to LCP 2021 for predicting the lexical complexity of English words in a given context. We assemble a feature engineering-based model with a deep neural network model founded on BERT. While BERT itself performs competitively, our feature engineering-based model helps in extreme cases, eg. separating instances of easy and neutral difficulty. Our handcrafted features comprise a breadth of lexical, semantic, syntactic, and novel phonological measures. Visualizations of BERT attention maps offer insight into potential features that Transformers models implicitly learn when fine-tuned for the purposes of lexical complexity prediction. Our ensemble technique performs reasonably well in predicting the complexities of single words, and we demonstrate how such techniques can be harnessed to perform well when on multi word expressions too.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Table of Contents
@@ -187,7 +189,7 @@ Results from the SemEval-2018 task \citep{yimam2018report} show progress in CWI 
 
 \begin{table}
   \centering
-  \begin{tabular}{l|l|r|r|r}
+  \begin{tabular}{l|lrrr}
     \hline
     \centering
     \textbf{Corpus} & \textbf{Subtask} & \textbf{Train} &  \textbf{Trial} &  \textbf{Test} \\
@@ -206,15 +208,15 @@ Results from the SemEval-2018 task \citep{yimam2018report} show progress in CWI 
   \caption{\label{tab:datasets} LCP train, trial, and test sets.}
 \end{table}
 
-\citet{shardlow2020complex} present CompLex, a novel dataset in which each target expression (a single word or two-token MWE) is assigned a continuous label denoting its lexical complexity. Each label falls in range 0-1, and represents the (normalized) average score given by employed crowd workers who report a given expression's difficulty on a 5-point Likert scale. Note that all crowd workers originate from English speaking countries (UK, USA, and Australia). We define a sample's \textit{class} as the bin to which its complexity label belongs, where bins are formed using the following mapping of complexity ranges: $[0,0.2) \rightarrow 1$, $[0.2, 0.4) \rightarrow 2$, $[0.4, 0.6) \rightarrow 3$, $[0.6, 0.8) \rightarrow 4$, $[0.8, 1] \rightarrow 5$. Target expressions in CompLex have 0.395 average complexity and 0.115 standard deviation, reflecting an imbalance in favor of class 2 and 3 samples.
+\citet{shardlow2020complex} present CompLex, a novel dataset in which each target expression (a single word or two-token MWE) is assigned a continuous label denoting its lexical complexity. Each label falls in range 0-1, and represents the (normalized) average score given by employed crowd workers who report the given expression's difficulty on a 5-point Likert scale. Note that all crowd workers originate from English speaking countries (UK, USA, and Australia). We define a sample's \textit{class} as the bin to which its complexity label belongs, where bins are created using the following mapping of complexity ranges: $[0,0.2) \rightarrow 1$, $[0.2, 0.4) \rightarrow 2$, $[0.4, 0.6) \rightarrow 3$, $[0.6, 0.8) \rightarrow 4$, $[0.8, 1] \rightarrow 5$. Target expressions in CompLex have 0.395 average complexity and 0.115 standard deviation, reflecting an imbalance in favor of class 2 and 3 samples.
 
-Each target expression is accompanied by the sentence it was extracted from, where certain target words appear multiple times in the dataset (in different contexts). A target expression is drawn from one of three sources (Bible, Biomed, and Europarl) in an effort to motivate study of domain-specific linguistic features. As noted by \citet{shardlow2020complex}, Biomed samples appear to be on average 1.7 and 2.2 percent higher in lexical complexity than Bible and Europarl samples, respectively. This we believe may reflect the elevated diction exhibited in biomedical research and academic writing in general, a style of language that differs from typical colloquial dialogue used in biblical scripture and parliamentary debate. Although an annotator's predisposition to theology, academia, and/or politics may affect their labeling of samples in CompLex, this component is sadly beyond the scope of this study. A summary of train, trial,\footnote{In our study we avoid the trial set as we find it to be less representative of the training data, opting instead for training set cross-validation (stratified by corpus and complexity label).} and test set samples is given in Table \ref{tab:datasets}.
+Each target expression is accompanied by the sentence (ie. context) it was extracted from, where certain target words appear multiple times in the dataset (across different contexts). A target expression is drawn from one of three sources (Bible, Biomed, and Europarl) in an effort to motivate study of domain-specific linguistic features. As noted by \citet{shardlow2020complex}, Biomed samples appear to be on average 1.7 and 2.2 percent higher in lexical complexity than Bible and Europarl samples, respectively. This we believe may reflect the elevated diction generally exhibited in biomedical research and academic writing, a style of language that differs from typical colloquial dialogue in biblical scripture and parliamentary debate. Although an annotator's predisposition to theology, academia, and/or politics may affect their labeling of samples in CompLex, this component is sadly beyond the scope of this study. Nonetheless, a summary of train, trial,\footnote{In our study we avoid the trial set as we find it to be less representative of the training data, opting instead for training set cross-validation (stratified by corpus and complexity label).} and test set samples is given in Table \ref{tab:datasets}.
 
 \section{External Datasets}
 
 \begin{table}
   \centering
-  \begin{tabular}{c|c|c|c}
+  \begin{tabular}{l|rrr}
     \hline
     \centering
     \textbf{Newswire} & \textbf{Files} & \textbf{Articles} & \textbf{Total Words} \\
@@ -227,13 +229,13 @@ Each target expression is accompanied by the sentence it was extracted from, whe
     Total & 314 & 4111240 & 1756504\\
     \hline
   \end{tabular}
-  \caption{\label{tab:gigaword_breakdown} Breakdown of Gigaword articles by newswire. Note that for each newswire, articles are grouped together in specific files. Total Words denotes the total number of whitespace-separated tokens across all articles of a given newswire.}
+  \caption{\label{tab:gigaword_breakdown} Breakdown of Gigaword articles by newswire. Note that for each newswire, articles are grouped together in certain files. \textbf{Total Words} denotes the total number of whitespace-separated tokens across all articles of a given newswire.}
 \end{table}
 
 In this study, we use four additional corpora to extract a breadth of term frequency-based features for training our feature engineering-based model on:
 
 \begin{itemize}
-  \item \textbf{English Gigaword Fifth Edition} (Gigaword): this comprises articles from seven prominent international English newswires, acquired by the Linguistic Data Consortium (LDC) \citep{parker2011english}. Newswires include the Agence France Press English Service (AFE), Associated Press Worldstream English Service (APW), The New York Times Newswire Service (NYT), and The Xinhua News Agency English Service (XIE). Table \ref{tab:gigaword_breakdown} provides a breakdown of each newswire for convenience.
+  \item \textbf{English Gigaword Fifth Edition} (Gigaword): this comprises articles from seven prominent international English newswires, acquired by the Linguistic Data Consortium (LDC) \citep{parker2011english}. Newswires include the Agence France Press English Service (AFE), Associated Press Worldstream English Service (APW), The New York Times Newswire Service (NYT), and The Xinhua News Agency English Service (XIE). Table \ref{tab:gigaword_breakdown} provides a breakdown of each newswire for reference.
   \item \textbf{Google Books Ngrams, version 2} (GBND): this is used to count occurences of phrases across a corpus of books, accessed via the PhraseFinder API \citep{phrasefinder}. The full corpus spans about 8 million books (ie. about 6\% of books ever published), and is constructed using improved OCR technology and metadata extraction compared to its prior version \citep{lin2012syntactic}.
   \item \textbf{British National Corpus, version 3} (BNC): this is a 100 million word collection of British written and spoken English text \citep{bnc2007british}. Particularly intruiging is its consideration of spoken English text, for this may potentially account for intricacies of language in speech versus in writing.
   \item \textbf{SUBTLEXus}: this comprises American English movie subtitles totaling 51 million in words. The creators of SUBTLEXus \citep{brysbaert2009moving} offer multiple ready-made word frequency lists; one list considers the number of movies containing a given word, whereas another measures how many times the word occurs specifically in its lowercase form. Please see Appendix \ref{appendix:SUBTLEXus} for further details.
@@ -241,26 +243,92 @@ In this study, we use four additional corpora to extract a breadth of term frequ
 
 \chapter{Data Exploration}
 
+\section{Assessing Baseline Models}
+
 \begin{table}
   \centering
   \begin{tabular}{l|c|c|c|c}
   \hline
-    & \textbf{All} & \textbf{Handcrafted} & \textbf{GloVe word+context} & \textbf{InferSent} \\
+  \textbf{Corpus} & \textbf{All} & \textbf{Handcrafted} & \textbf{GloVe word+context} & \textbf{InferSent} \\
   \hline
-  \textbf{All} & 0.1399 & 0.0964 & 0.0749 & 0.1585 \\
-  \textbf{Bible} & 0.1133 & 0.0986 & 0.0884 & - \\
-  \textbf{Biomed} & - & 0.1094 & 0.0852 & 0.2060 \\
-  \textbf{Europarl} & - & 0.0762 & 0.0698 & - \\
+  All & 0.1399 & 0.0964 & 0.0749 & 0.1585 \\
+  Bible & 0.1133 & 0.0986 & 0.0884 & - \\
+  Biomed & - & 0.1094 & 0.0852 & 0.2060 \\
+  Europarl & - & 0.0762 & 0.0698 & - \\
   \hline
   \end{tabular}
-  \caption{\label{tab:baseline_models} The results of linear regression with different baseline feature subsets. All results are reported in terms of mean absolute error (MAE). Note that \textbf{GloVe word+context} denotes the concatenation of 300-dim GloVe word and 300-dim GloVe context embeddings. A hyphen `-' denotes an extremely high MAE.}
+  \caption{\label{tab:baseline_models} Performances of linear regression models fitted on different baseline feature subsets. The single word training set is split into smaller training and development subsets (stratified by corpus and class); all models are fitted and evaluated on the former and latter, respectively. All scores are reported in terms of mean absolute error (MAE). Note that \textbf{GloVe word+context} denotes the concatenation of 300-dim GloVe word and 300-dim GloVe context embeddings. A hyphen `-' denotes an extremely high MAE.}
 \end{table}
 
-\begin{table}[]
+\begin{table}
   \centering
-  \begin{tabular}{ccp{0.6\linewidth}cl}
+  \begin{tabular}{l|c|c|c|c}
   \hline
-  \multicolumn{1}{c}{\textbf{ID}} & \multicolumn{1}{c}{\textbf{Corpus}} & \multicolumn{1}{c}{\textbf{Context}} & \textbf{Complexity} &  \\
+  \textbf{Corpus} & \textbf{Class} & \textbf{HC} & \textbf{Glove word+context} & \textbf{InferSent} \\
+  \hline
+  Bible & 1 & 0.1354 & 0.0931 & - \\
+   & 2 & 0.0504 & 0.0690 & - \\
+   & 3 & 0.1605 & 0.0681 & - \\
+   & 4 & 0.3219 & 0.2319 & - \\
+   & 5 & 0.5588 & 0.1693 & - \\
+  \hline
+  Biomed & 1 & 0.1467 & 0.0903 & 0.2341 \\
+   & 2 & 0.0586 & 0.0619 & 0.1812 \\
+   & 3 & 0.1473 & 0.0910 & 0.1995 \\
+   & 4 & 0.3004 & 0.1371 & 0.3437 \\
+   & 5 & 0.4070 & 0.2334 & 0.3614 \\
+   \hline
+  Europarl & 1 & 0.1098 & 0.0720 & - \\
+   & 2 & 0.0417 & 0.0523 & - \\
+   & 3 & 0.1564 & 0.0737 & - \\
+   & 4 & 0.3156 & 0.2200 & - \\
+  \hline
+  \end{tabular}
+  \caption{\label{tab:baseline_models_by_class} 
+  Performances (organized by class) of linear regression models fitted on different baseline feature subsets. Note that we did not try the \textbf{All} feature subset shown in Table \ref{tab:baseline_models} due to time constraints. All scores are reported in terms of mean absolute error (MAE). A hyphen `-' denotes an extremely high MAE.}
+\end{table}
+
+\begin{table}
+  \centering
+  \begin{tabular}{l|c|c|c|c}
+  \hline
+  \textbf{Corpus} & \textbf{Class} & \textbf{HC} & \textbf{Glove word+context} & \textbf{InferSent} \\
+  \hline
+  Bible & 1 & 0.1377 & 0.0909 & 0.1449 \\
+  & 2 & 0.0549 & 0.0845 & 0.1146 \\
+  & 3 & 0.1528 & 0.0634 & 0.1942 \\
+  & 4 & 0.3126 & 0.1922 & 0.3348 \\
+  & 5 & 0.5630 & 0.1420 & 0.5505 \\
+  \hline
+  Biomed & 1 & 0.1513 & 0.0893 & - \\
+  & 2 & 0.0693 & 0.0718 & - \\
+  & 3 & 0.1275 & 0.0927 & - \\
+  & 4 & 0.2765 & 0.1243 & - \\
+  & 5 & 0.3721 & 0.2184 & - \\
+  \hline
+  Europarl & 1 & 0.1078 & 0.0662 & 0.1556 \\
+  & 2 & 0.0434 & 0.0610 & 0.1252 \\
+  & 3 & 0.1483 & 0.0759 & 0.1645 \\
+  & 4 & 0.3082 & 0.1880 & 0.2344 \\
+  \hline
+  \end{tabular}
+  \caption{\label{tab:baseline_models_by_class_reduced} 
+  Performances (organized by class) of linear regression models fitted on different baseline feature subsets. This is analogous to Table \ref{tab:baseline_models_by_class}, but models were fit on a reduced training set containing only half the available class 2 samples.}
+\end{table}
+
+We focus initially on the single word subtask by experimenting with a baseline model inspired by that of the authors of CompLex \citep{shardlow2020complex}. Our goal in using this baseline model is to closely examine successful predictors, and to understand the shortcomings of said feature set, guiding the construction of \texttt{BigGreen}'s own system. The original baseline model comprises a series of handcrafted features (HC), GloVe word embeddings \citep{pennington2014glove}, GloVe context embeddings (kindly see Section \ref{sec:semantic_features} for more on this) and InferSent sentence embeddings \citep{conneau2017supervised}. The handcrafted features include (1) target word frequency, courtesy of the Wordfreq library \citep{speer2018luminosoinsight}, (2) word length, and (3) syllable count, via the Syllables library.\footnote{\url{https://github.com/prosegrinder/python-syllables}} 
+
+As shown in Table \ref{tab:baseline_models}, performances of variant baseline models (\textit{variant} denoting a fitting over a subset of the aforementioned features) show promise in the use of all handcrafted lexical features, and successes with certain semantic features (eg. GloVe word embeddings, but not InferSent embeddings). InferSent embeddings appear to not generalize well for the task at hand, which may suggest a general need for fine-tuning upon whatever pre-trained models we end up extracting semantic representations of sentences from.
+
+Performances of the variant baseline models can be examined even further, namely at the class-level (ie. how well does a given model predict lexical complexity across individual class of difficulty?). Observe how in Table \ref{tab:baseline_models_by_class}, it appears that models based on HC and Glove word+context did best at predicting on class 2 samples, regardless of corpora. This is likely due to there being more class 1-3 samples available in the CompLex dataset to train on, causing models to favor lower-ratings. To try and boost scores across higher-rating samples, we refit our variant baseline models, but this time training upon a reduced training set containing only half the available class 2 samples. As shown in Table \ref{tab:baseline_models_by_class_reduced}, it appears that models based on HC and Glove word+context do perform slightly better on classes 3-5 than previously, across all corpora. Performance on class 2 samples is sacrificed, however. Nonetheless, we hope to reuse this strategy for boosting class 4, 5 scores later. 
+
+\section{Examining Challenging Samples}
+
+\begin{table}
+  \centering
+  \begin{tabular}{l|cp{0.6\linewidth}cl}
+  \hline
+  \multicolumn{1}{l|}{\textbf{ID}} & \multicolumn{1}{c}{\textbf{Corpus}} & \multicolumn{1}{c}{\textbf{Context}} & \textbf{Complexity} &  \\
   \hline
   1 & Bible & Now God made Daniel to find kindness and compassion in the sight of the prince of the \textbf{eunuchs}. & 0.632 &  \\
   2 & Bible & he sent Hadoram his son to king David, to Greet him, and to bless him, because he had fought against Hadadezer and struck him; (for Hadadezer had wars with \textbf{Tou};) and he had with him all kinds of vessels of gold and silver and brass. & 0.825 &  \\
@@ -280,23 +348,15 @@ In this study, we use four additional corpora to extract a breadth of term frequ
 \begin{figure}
   \centering
   \begin{minipage}[b]{0.45\textwidth}
-      \includegraphics[width=\textwidth]{is_acronym.png}
-      \caption{\label{fig:is_acronym} Probability density functions for acronym vs. non-acronym target words in single word training set.}
+    \includegraphics[width=\textwidth]{is_acronym.png}
+    \caption{\label{fig:is_acronym} Probability density functions for acronym vs. non-acronym target words in single word training set.}
   \end{minipage}
   \hfill
   \begin{minipage}[b]{0.45\textwidth}
-      \includegraphics[width=\textwidth]{is_proper.png}
-      \caption{\label{fig:is_proper} Probability density functions for proper vs. improper noun/adjective target words in single word training set.}
+    \includegraphics[width=\textwidth]{is_proper.png}
+    \caption{\label{fig:is_proper} Probability density functions for proper vs. improper noun/adjective target words in single word training set.}
   \end{minipage}
 \end{figure}
-
-\section{Assessing Baseline Models}
-
-We focus initially on the single word subtask by experimenting with a baseline model inspired by that of the authors of CompLex \citep{shardlow2020complex}. Our goal in using this modified baseline model is to identify successful predictors, and to understand the shortcomings of said feature set, guiding the construction of BigGreen's own system. A baseline model comprises a series of handcrafted features, GloVe word embeddings \citep{pennington2014glove}, GloVe context embeddings (kindly see Section \ref{paper:semantic_features} for more on this) and InferSent sentence embeddings \citep{conneau2017supervised}. The handcrafted features include (1) target word frequency, courtesy of the Wordfreq library \citep{speer2018luminosoinsight}, (2) word length, and (3) syllable count, courtesy of the Syllables library.\footnote{\url{https://github.com/prosegrinder/python-syllables}}. 
-
-As shown in Table \ref{tab:baseline_models}, performances of variant baseline models (a \textit{variant} being a fitting over some subset of the aforementioned features) show promise in the use of all handcrafted lexical features, and successes with certain semantic features (eg. GloVe word embeddings, but not InferSent sentence embeddings). 
-
-\section{Examining Challenging Samples}
 
 We manually assess training set samples that multiple variant baseline models struggled with, samples that are perhaps naturally difficult to predict on; Table \ref{tab:samples} shows some of these. Observe that samples 6 and 7 bear target words that are acronyms, terms like \lq{RA}\rq and \lq{APP}\rq{} whose meanings are perhaps assumed to be common knowledge to academic audiences. Samples 2, 8, and 10 have target words that are proper nouns and adjectives, usually referring to domain-specific entities that cannot necessarily be learned from context clues (eg. samples 2 and 8 seem to expect the reader to know what \lq{Tou}\rq{} and \lq{Cre}\rq{} are). Figures \ref{fig:is_acronym} and \ref{fig:is_proper} illustrate the effects of acronymity and propriety to perceived target word complexity.
 
@@ -310,7 +370,7 @@ Finally, we notice that target words used rarely in language (eg. Samples 1, 3, 
     \hline
     \centering
     & \multicolumn{3}{c|}{\textbf{Character Transition Probability}} &  &  \\
-    \textbf{Char. Transition} & \textbf{Gigaword} & \textbf{Class 1} & \textbf{Class 4, 5} & \textbf{T-Statistic} & \textbf{P-Value}  \\
+    \textbf{Char. Transition} & \specialcell{\textbf{Gigaword}\\\textbf{Samples}} & \specialcell{\textbf{Class 1}\\\textbf{Samples}} & \specialcell{\textbf{Class 4, 5}\\\textbf{Samples}} & \textbf{T-Statistic} & \textbf{P-Value}  \\
     \hline
     $i \rightarrow d$ & 0.0597 & 0.0331 &  0.0588 &    -7.3532 &  4.5127e-10 \\
     $o \rightarrow s$ & 0.0402 & 0.0200 &  0.0976 &    -4.4796 &  2.7255e-05 \\
@@ -322,14 +382,14 @@ Finally, we notice that target words used rarely in language (eg. Samples 1, 3, 
     $e \rightarrow s$ & 0.1255 & 0.2019 &  0.2143 &    -1.2893 &  9.8986e-02 \\
     \hline
   \end{tabular}
-  \caption{\label{tab:top_char_transitions} Character transitions that are more frequent in higher complexity target words (at 10\% significance level). Note that no $y \rightarrow c$ transitions occur across class 3 samples.}
+  \caption{\label{tab:top_char_transitions} Character transitions that are more frequent in higher complexity target words (at 10\% significance level).}
 \end{table}
 
 \begin{figure}
   \centering
   \includegraphics[scale=0.55]{character_transition_probabilities.png}
   \captionsetup{justification=centering}
-  \caption{\label{fig:character_transition_probabilities} Lowercase ASCII transition probabilities, estimated using Gigaword.}
+  \caption{\label{fig:character_transition_probabilities} Lowercase ASCII transition probabilities, estimated over Gigaword.}
 \end{figure}
 
 While prior top-performing approaches harness a variety of linguistic information across lexical, semantic, syntactic, and psycholinguistic features \citep{paetzold2016sv000gg, ronzano2016taln, mukherjee2016ju_nlp}, there appears to be a lack of consideration of phonological features. \citet{hayden1950relative} suggests that the relative frequencies of phonemes can potentially be used to identify important phonemes to tutor foreign language students with who exhibit numerous phonemic difficulties. While we assume that each crowd annotator of CompLex understand at least one dialect of English, we also assume for convenience that they share similar literacy levels and general familiarity with the English language. We hypothesize that because certain English phonemes (ie. soundable segments or character n-grams) are evidently more common in usage than others \citep{hayden1950relative}, a target word's complexity could be impacted by an annotator's familiarity with its constituent phonemes.
@@ -360,7 +420,7 @@ These features capture lexical information pertaining to the target word:
   
 \subsubsection{Semantic Features}
 
-\label{paper:semantic_features} These features capture the target word's meaning:
+\label{sec:semantic_features} These features capture the target word's meaning:
 
 \begin{itemize}
   \item \textbf{WordNet features}: the number of hyponyms and hypernyms associated with the target word in WordNet \citep{fellbaum2010wordnet}.
@@ -408,7 +468,7 @@ For the single word subtask, we select features using a combination of filter an
 \begin{figure}
   \centering
   \includegraphics[scale=0.75]{mi.png}
-  \caption{\label{fig:mi} Performances of LR fitted (with 5-fold cross-validation) on top-k features by mutual information.}
+  \caption{\label{fig:mi} Performances of linear regression models fitted (with 5-fold cross-validation) on top-k features by mutual information.}
 \end{figure}
 
 \begin{itemize}
@@ -430,7 +490,9 @@ For the single word subtask, we select features using a combination of filter an
 
 \subsection{Training}
 
-Prior to training, we Z-score standardize all features to have approximately zero mean and unit variance. For the single word subtask, we fit Linear, Lasso, Elastic Net, Support Vector Machine \citep{platt1999probabilistic} (with linear kernel), Support Vector Machine (with radial basis function kernel), K-Nearest Neighbors \citep{wiki:K-nearest_neighbors_algorithm}, and XGBoost \citep{chen2016xgboost} regression models. After identifying the best performing model by Pearson correlation, we seek to mitigate the imbalanced nature of the target variable, ie. multitude of class 1,2,3 and lack of class 4,5 samples: we devise a sister version of our top-performing model, fit upon a \textit{reduced} training set. For the \textit{reduced} set, we tune percentages removed from classes 1-3 by performing cross-validation on the full  training set.
+\label{sec:training}
+
+Prior to training, we Z-score standardize all features to have approximately zero mean and unit variance. For the single word subtask, we fit Linear, Lasso, Elastic Net, Support Vector Machine \citep{platt1999probabilistic} (with linear kernel), Support Vector Machine (with radial basis function kernel), K-Nearest Neighbors \citep{wiki:K-nearest_neighbors_algorithm}, and XGBoost \citep{chen2016xgboost} regression models. After identifying the best performing model by Pearson correlation, we seek to mitigate the imbalanced nature of the target variable, ie. multitude of class 1, 2, 3 and lack of class 4, 5 samples: we devise a sister version of our top-performing model, fit upon a \textit{reduced} training set. For the \textit{reduced} set, we tune percentages removed from classes 1-3 by performing cross-validation on the full  training set.
 
 \section{Feature Learning-based Approach}
 
@@ -452,7 +514,7 @@ Our model's output layer produces the predicted lexical complexity for a given t
 
 \section{Ensembling}
 
-Our best performing feature engineering-based regression model yields two sets of predictions (from fitting on \textit{full} and \textit{reduced} training sets, respectively). We default to using the \textit{full} predictions, then tune a threshold, where predictions higher than the threshold (likely of class 4,5 samples) are overwritten with the \textit{reduced} predictions. We compute a weighted average ensemble of these predictions with those of our MT-DNN model to obtain a final set of predictions for the single word subtask. 
+Our best performing feature engineering-based regression model yields two sets of predictions (from fitting on \textit{full} and \textit{reduced} training sets, respectively). We default to using the \textit{full} predictions, then tune a threshold, where predictions higher than the threshold (likely of class 4, 5 samples) are overwritten with the \textit{reduced} predictions. We compute a weighted average ensemble of these predictions with those of our MT-DNN model to obtain a final set of predictions for the single word subtask. 
 
 For the MWE subtask, fitted models from the previous subtask are harnessed to predict lexical complexities for the constituent head and tail words. We then compute a weighted average ensemble of the predicted complexities \textit{and} the predictions of an MT-DNN model trained on MWEs.
 
@@ -464,7 +526,7 @@ We present performances of \texttt{BigGreen}'s system on each subtask in Tables 
 
 \begin{table}[!htbp]
   \centering
-  \begin{tabular}{lcccc}
+  \begin{tabular}{l|cccc}
     \hline \textbf{Model} & \textbf{Pearson} & \textbf{Rank} & \textbf{Spearman} & \textbf{MAE} \\ \hline
     Linear Regression	& 0.7347 & - &	0.6993 &	0.0669 \\
     Forward Feature Selection (FFS)	& 0.7313 & - &	0.7053 & 0.0671 \\
@@ -478,7 +540,7 @@ We present performances of \texttt{BigGreen}'s system on each subtask in Tables 
     XGBoost$_\textit{reduced}$ &	0.7456 & - &	0.7157 &	0.0751 \\
     XGBoost$_{\textit{full}+\textit{reduced}}$ & 0.7576 & - & 0.7220 & 0.0646 \\
     MT-DNN & 0.7484 & -	& 0.7044 & 0.0664 \\
-    Ensemble (submission) & 0.7749 & 8 of 54 & 0.7294 & 0.0629 \\
+    Ensemble (submission) & \textbf{0.7749} & \textbf{8 of 54} & \textbf{0.7294} & \textbf{0.0629} \\
     \hline
     Best competition results & 0.7886 & & 0.7425 & 0.0609 \\ 
     \hline
@@ -488,13 +550,13 @@ We present performances of \texttt{BigGreen}'s system on each subtask in Tables 
 
 \begin{table}[!htbp]
   \centering
-  \begin{tabular}{lcccc}
+  \begin{tabular}{l|cccc}
     \hline \textbf{Model} & \textbf{Pearson} & \textbf{Rank} & \textbf{Spearman} & \textbf{MAE} \\ \hline
     XGBoost$_{\textit{full}+\textit{reduced}}(\text{head})$ & 0.7164 & - & 0.7305 & 0.1281 \\
     XGBoost$_{\textit{full}+\textit{reduced}}(\text{tail})$ & 0.7188 & - & 0.7416 & 0.1306 \\
-    MT-DNN & 0.7890 & - & 0.7649 & 0.0766 \\
+    MT-DNN & 0.7890 & - & 0.7649 & \textbf{0.0766} \\
     Ensemble (submission) & 0.7898 & 25 of 37 & 0.7769 & 0.0903 \\
-    Ensemble (post-competition) & 0.8290 & *14 of 37 & 0.8120 & 0.0857 \\
+    Ensemble (post-competition) & \textbf{0.8290} & \textbf{*14 of 37} & \textbf{0.8120} & 0.0857 \\
     \hline
     Best competition results & 0.8612 & &  0.8548 & 0.0616 \\ 
     \hline
@@ -528,14 +590,12 @@ In total we consider 110 features, in addition to our multidimensional embedding
 \begin{figure}
   \centering
   \includegraphics[scale=0.6]{head_correlations_tf.png}
-  \captionsetup{justification=centering}
   \caption{\label{fig:head_correlations_tf} Attention head correlation between word frequency and total attention received by word, averaged across 100 random test set samples.}
 \end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[scale=0.6]{head_3-9_tf_avg.png}
-  \captionsetup{justification=centering}
   \caption{\label{fig:head_3-9_tf_avg} Word frequency vs. average head 3-9 attention weight directed to words of a random sample.}
 \end{figure}
 
@@ -549,7 +609,6 @@ In total we consider 110 features, in addition to our multidimensional embedding
 \begin{figure}
   \centering
   \includegraphics[scale=0.1]{images/pickle.png}
-  \captionsetup{justification=centering}
   \caption{\label{fig:attn_feature_importances} This figure will show a heatmap of attention head importances measured using a gradient-based approach.}
 \end{figure}
 
@@ -565,7 +624,7 @@ This paragraph will discuss our interpretations of Figure \ref{fig:attn_feature_
 
 In this paper, we report inspirations for a system submitted by \texttt{BigGreen} to LCP SharedTask 2021, performing reasonably well for the single word subtask by adapting ensemble methods upon feature engineering and feature learning-based models. We see potential in future deep learning approaches, acknowledging the need for strong word frequency-based handcrafted features for the time being. We surpass our submitted results for the MWE subtask by utilizing the predictive capabilities of our single word subtask models, under the assumption that MWE complexity is compositional with respect to its constituent tokens.
 
-Avenues for improvement include better data aggregation, as a relative lack of class 4,5 samples hurts Pearson correlation across samples of especially extreme complexity. A future approach may involve synthetic data generation using SMOGN \citep{branco2017smogn}. \citet{shardlow2020complex} acknowledge a reader's familiarity with a genre may affect his/her perceived complexity of a word, however the CompLex dataset lacks details on each annotator's expertise or background, which may offer valuable insights. Future studies may consider extracting multidimensional embeddings from the later layers of their deep learning models, potentially feeding these embeddings into feature engineering-based models.
+Avenues for improvement include better data aggregation, as a relative lack of class 4, 5 samples hurts Pearson correlation across samples of especially extreme complexity. A future approach may involve synthetic data generation using SMOGN \citep{branco2017smogn}. \citet{shardlow2020complex} acknowledge a reader's familiarity with a genre may affect his/her perceived complexity of a word, however the CompLex dataset lacks details on each annotator's expertise or background, which may offer valuable insights. Future studies may consider extracting multidimensional embeddings from the later layers of their deep learning models, potentially feeding these embeddings into feature engineering-based models.
 
 \appendix
 
@@ -624,7 +683,7 @@ Here, we describe in greater detail the various features that were experimented 
     \hline 
     \texttt{char\_transition\_std} & Standard deviation of the set described above.\\
     \hline 
-    \texttt{phoneme\_transition\_min} & Minimum of the set of phoneme transition probabilities for each character bigram in the target word. Ground truth phoneme transition probabilities between any two phonemes are estimated over the Gigaword corpus. The phoneme set considered is that of the CMU Pronouncing Dictionary.\tablefootnote{\url{http://speech.cs.cmu.edu/cgi-bin/cmudict}}\\
+    \texttt{phoneme\_transition\_min} & Minimum of the set of phoneme transition probabilities for each character bigram in the target word. Ground truth phoneme transition probabilities between any two phonemes are estimated over the Gigaword corpus. The phoneme set considered is that of the CMU Pronouncing Dictionary.\tablefootnote{\url{http://www.speech.cs.cmu.edu/cgi-bin/cmudict}}\\
     \hline 
     \texttt{phoneme\_transition\_max} & Maximum of the set described above.\\
     \hline 
