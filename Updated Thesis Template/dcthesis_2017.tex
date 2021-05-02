@@ -54,6 +54,13 @@
 \usepackage{caption}
 \usepackage{tablefootnote}
 \usepackage{float}
+\usepackage{xcolor}
+\hypersetup{
+    colorlinks,
+    linkcolor={blue!50!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
+}
 
 \newcommand{\comment}[1]{}
 
@@ -313,16 +320,18 @@ In this study, we use four additional corpora to extract a breadth of term frequ
   \hline
   \end{tabular}
   \caption{\label{tab:baseline_models_by_class_reduced} 
-  Performances (organized by class) of linear regression models fitted on different baseline feature subsets. This is analogous to Table \ref{tab:baseline_models_by_class}, but models were fit on a reduced training set containing only half the available class 2 samples.}
+  Performances (organized by class) of linear regression models fitted on different baseline feature subsets. This is analogous to Table \ref{tab:baseline_models_by_class}, but this time models were fit on a reduced training set containing only half the available class 2 samples.}
 \end{table}
 
 We focus initially on the single word subtask by experimenting with a baseline model inspired by that of the authors of CompLex \citep{shardlow2020complex}. Our goal in using this baseline model is to closely examine successful predictors, and to understand the shortcomings of said feature set, guiding the construction of \texttt{BigGreen}'s own system. The original baseline model comprises a series of handcrafted features (HC), GloVe word embeddings \citep{pennington2014glove}, GloVe context embeddings (kindly see Section \ref{sec:semantic_features} for more on this) and InferSent sentence embeddings \citep{conneau2017supervised}. The handcrafted features include (1) target word frequency, courtesy of the Wordfreq library \citep{speer2018luminosoinsight}, (2) word length, and (3) syllable count, via the Syllables library.\footnote{\url{https://github.com/prosegrinder/python-syllables}} 
 
 As shown in Table \ref{tab:baseline_models}, performances of variant baseline models (\textit{variant} denoting a fitting over a subset of the aforementioned features) show promise in the use of all handcrafted lexical features, and successes with certain semantic features (eg. GloVe word embeddings, but not InferSent embeddings). InferSent embeddings appear to not generalize well for the task at hand, which may suggest a general need for fine-tuning upon whatever pre-trained models we end up extracting semantic representations of sentences from.
 
-Performances of the variant baseline models can be examined even further, namely at the class-level (ie. how well does a given model predict lexical complexity across individual class of difficulty?). Observe how in Table \ref{tab:baseline_models_by_class}, it appears that models based on HC and Glove word+context did best at predicting on class 2 samples, regardless of corpora. This is likely due to there being more class 1-3 samples available in the CompLex dataset to train on, causing models to favor lower-ratings. To try and boost scores across higher-rating samples, we refit our variant baseline models, but this time training upon a reduced training set containing only half the available class 2 samples. As shown in Table \ref{tab:baseline_models_by_class_reduced}, it appears that models based on HC and Glove word+context do perform slightly better on classes 3-5 than previously, across all corpora. Performance on class 2 samples is sacrificed, however. Nonetheless, we hope to reuse this strategy for boosting class 4, 5 scores later. 
+Performances of the variant baseline models can be examined even further, namely at the class-level (ie. how well does a given model predict lexical complexity across individual class of difficulty?). Observe how in Table \ref{tab:baseline_models_by_class}, it appears models based on HC and Glove word+context do best at predicting on class 2 samples, regardless of corpora. This is likely due to there being more class 1-3 samples available in the CompLex corpus to train on, causing models to favor lower-ratings. To try and boost scores across higher-rating samples, we refit our variant baseline models, but this time training upon a reduced training set containing only half the available class 2 samples. As shown in Table \ref{tab:baseline_models_by_class_reduced}, models based on HC and Glove word+context indeed perform slightly better on classes 3-5 than previously, across all corpora. Performance on class 2 samples is sacrificed, however. Nonetheless, we hope to reuse this strategy for boosting class 4, 5 scores later. 
 
 \section{Examining Challenging Samples}
+
+\label{sec:examining_challenging_samples}
 
 \begin{table}
   \centering
@@ -498,19 +507,29 @@ Prior to training, we Z-score standardize all features to have approximately zer
 
 Our handcrafted feature set relies heavily on target word-specific features. Beyond N-gram and syntactic features, it is a cursory analysis of the context surrounding the target word. We seek an alternative, automated approach using feature learning.
 
-\subsection{Architecture}
+\subsection{Background}
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.75]{architecture.png}
+  \caption{\label{fig:architecture} Architecture of the feature learning-based model, based on the general architecture of the MT-DNN model for representation learning as specified by \citet{liu2019multi}.}
+\end{figure}
 
 LSTM-based approaches have been used to model contexts of target words in past works \citep{hartmann2018nilc, de2018deep}. Yet, an issue with a single LSTM is its ability to read tokens of an input sentence sequentially only in a single direction (eg. left-to-right). It inspires us to try a Transformer-based approach \citep{vaswani2017attention}, architectures that process sentences as a whole (instead of word-by-word) by applying \textit{attention} mechanisms upon them. Attention weights are useful as they can be interpreted as learned relationships between words in a given sentence. BERT \citep{devlin2018bert} is one such language representation model used for a variety of natural language understanding (NLU) tasks.
 
-Multi-Task Deep Neural Network (MT-DNN) proposed by \citet{liu2019multi} offers state-of-the-art results for multiple NLU tasks by incorporating benefits of both multi-task learning and language model pre-training. We are able to initialize MT-DNN's shared text encoding layers with a pre-trained BERT base model (cased), and fine-tune its later layers for 5 epochs, using a mean squared error loss function and default hyperparameters. Such hyperparameter settings are provided in Appendix \ref{appendix:hyperparameters}. Note that the model is fine-tuned on only the CompLex corpus.
+Multi-Task Deep Neural Network (MT-DNN) proposed by \citet{liu2019multi} offers state-of-the-art results for multiple NLU tasks by incorporating benefits of both multi-task learning and language model pre-training. Multi-task learning (MTL) is the process of applying knowledge learned from prior, related tasks to help learn to predict on a new task. \citet{liu2019multi} notes an advantage of MTL that is being able to conduct supervised learning in the presence of relatively few training samples, which is notable considering the limited size of the CompLex corpus (about 8000 single word training samples). Language model pre-training leverages universal representations learned by neural network language models that have been fitted on large amounts of unlabeled data; examples of such models include BERT \citep{devlin2018bert} and ELMo \citep{peters2018deep}. In this section, we describe the structure of the general-purpose MT-DNN model when applied for the purposes of lexical complexity prediction (a regression-based task, mind you), as shown in Figure \ref{fig:architecture}. 
 
-\subsection{Input Layer}
+\subsection{Lexicon Encoder}
 
-Data is fed to the model's input layer in \textit{PremiseAndOneHypothesis} format, premise and hypothesis being sentence and target word/MWE, respectively. The data is preprocessed by a BERT Tokenizer, backed by Hugging Face \citep{wolf2020transformers}.
+Samples are fed to MT-DNN's input layer in \textit{PremiseAndOneHypothesis} format; this means the model expects each input to be a pair of sentences: a premise and a hypothesis. We let the premise and hypothesis be the sentence and target word/MWE, respectively. The inputs are then preprocessed by a lexicon encoder to convert them from raw text to sequences of BPE tokens; we use a BERT Tokenizer, backed by Hugging Face \citep{wolf2020transformers}.
 
-\subsection{Output Layer}
+\subsection{Transformer Encoder}
 
-Our model's output layer produces the predicted lexical complexity for a given target word/MWE. Additionally, we extract \textit{attention maps} across each of the model's attention heads, for each test set sample. These will be assessed in Section \ref{sec:bert_attention}.
+The BERT base model (cased) is one particular shared representation that can be used to initialize the MT-DNN's transformer encoder. We choose the base (rather than large) model due to limited computational power of our machine, and we use its cased (rather than uncased) version due to experimentation in Section \ref{sec:examining_challenging_samples} showing a word's lexical complexity being affected by whether it is `proper' (which we identify based on capitalization).
+
+\subsection{Pairwise Text Similarity}
+
+Our MT-DNN's output layer produces the predicted lexical complexity for a given target word/MWE, ie. a continuous value in range 0-1. Additionally, we extract \textit{attention maps} across each of the model's attention heads, for each test set sample. These will be assessed in Section \ref{sec:bert_attention}.
 
 \section{Ensembling}
 
@@ -540,7 +559,7 @@ We present performances of \texttt{BigGreen}'s system on each subtask in Tables 
     XGBoost$_\textit{reduced}$ &	0.7456 & - &	0.7157 &	0.0751 \\
     XGBoost$_{\textit{full}+\textit{reduced}}$ & 0.7576 & - & 0.7220 & 0.0646 \\
     MT-DNN & 0.7484 & -	& 0.7044 & 0.0664 \\
-    Ensemble (submission) & \textbf{0.7749} & \textbf{8 of 54} & \textbf{0.7294} & \textbf{0.0629} \\
+    Ensemble (submission) & \textbf{0.7749} & 8 of 54 & \textbf{0.7294} & \textbf{0.0629} \\
     \hline
     Best competition results & 0.7886 & & 0.7425 & 0.0609 \\ 
     \hline
@@ -624,7 +643,7 @@ This paragraph will discuss our interpretations of Figure \ref{fig:attn_feature_
 
 In this paper, we report inspirations for a system submitted by \texttt{BigGreen} to LCP SharedTask 2021, performing reasonably well for the single word subtask by adapting ensemble methods upon feature engineering and feature learning-based models. We see potential in future deep learning approaches, acknowledging the need for strong word frequency-based handcrafted features for the time being. We surpass our submitted results for the MWE subtask by utilizing the predictive capabilities of our single word subtask models, under the assumption that MWE complexity is compositional with respect to its constituent tokens.
 
-Avenues for improvement include better data aggregation, as a relative lack of class 4, 5 samples hurts Pearson correlation across samples of especially extreme complexity. A future approach may involve synthetic data generation using SMOGN \citep{branco2017smogn}. \citet{shardlow2020complex} acknowledge a reader's familiarity with a genre may affect his/her perceived complexity of a word, however the CompLex dataset lacks details on each annotator's expertise or background, which may offer valuable insights. Future studies may consider extracting multidimensional embeddings from the later layers of their deep learning models, potentially feeding these embeddings into feature engineering-based models.
+Avenues for improvement include better data aggregation, as a relative lack of class 4, 5 samples hurts Pearson correlation across samples of especially extreme complexity. A future approach may involve synthetic data generation using SMOGN \citep{branco2017smogn}. \citet{shardlow2020complex} acknowledge a reader's familiarity with a genre may affect his/her perceived complexity of a word, however the CompLex corpus lacks details on each annotator's expertise or background, which may offer valuable insights. Future studies may consider extracting multidimensional embeddings from the later layers of their deep learning models, potentially feeding these embeddings into feature engineering-based models.
 
 \appendix
 
