@@ -61,6 +61,7 @@
     citecolor={blue!50!black},
     urlcolor={blue!80!black}
 }
+\usepackage{subcaption}
 
 \newcommand{\comment}[1]{}
 
@@ -147,7 +148,7 @@ This paper serves as my senior thesis for the undergraduate major in Computer Sc
 \chapter*{Abstract}
 %This is so the abstract appears in the ToC
 \addcontentsline{toc}{section}{Abstract}
-Tuning the complexity of one's writing is essential to presenting ideas in a logical, intuitive manner to particular audiences. This paper describes a system submitted by team \texttt{BigGreen} to LCP 2021 for predicting the lexical complexity of English words in a given context. We assemble a feature engineering-based model with a deep neural network model founded on BERT. While BERT itself performs competitively, our feature engineering-based model helps in extreme cases, eg. separating instances of easy and neutral difficulty. Our handcrafted features comprise a breadth of lexical, semantic, syntactic, and novel phonological measures. Visualizations of BERT attention maps offer insight into potential features that Transformers models implicitly learn when fine-tuned for the purposes of lexical complexity prediction. Our ensemble technique performs reasonably well in predicting the complexities of single words, and we demonstrate how such techniques can be harnessed to perform well when on multi word expressions too.
+Tuning the complexity of one's writing is essential to presenting ideas in a logical, intuitive manner to particular audiences. This paper describes a system submitted by team \texttt{BigGreen} to LCP 2021 for predicting the lexical complexity of English words in a given context. We assemble a feature engineering-based model with a deep neural network model founded on BERT. While BERT itself performs competitively, our feature engineering-based model helps in extreme cases, eg. separating instances of easy and neutral difficulty. Our handcrafted features comprise a breadth of lexical, semantic, syntactic, and novel phonetic measures. Visualizations of BERT attention maps offer insight into potential features that Transformers models implicitly learn when fine-tuned for the purposes of lexical complexity prediction. Our ensemble technique performs reasonably well in predicting the complexities of single words, and we demonstrate how such techniques can be harnessed to perform well when on multi word expressions too.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Table of Contents
@@ -174,7 +175,7 @@ Tuning the complexity of one's writing is essential to presenting ideas in a log
 Lexical simplification (LS) is the task of replacing difficult words in a text with simpler alternatives. It is relevant in reading comprehension, where early studies have shown infrequent words to lead to more time a reader spends fixated on it, and that ambiguity in a word's meaning further adds to comprehension time \citep{rayner1986lexical}. \citet{devlin1999simplifying} demonstrate that a combined approach studying both the \textit{syntactic} structure of a context (where certain compositions may be more difficult to understand than others) and the \textit{lexical} characteristics of each word (certain words are more frequent in language than other) can be used to simplify challenging texts for individuals suffering from aphasia. Complex word identification (CWI) is believed to be a fundamental step in the automation of lexical simplification \citep{shardlow2014out}. 
 Early techniques for conducting CWI, however, lack in robustness at the word level, from initially simplifying all words in given a sentence to then observe incurred change in meaning \citep{devlin1998use}, to applying simple thresholds on discriminative features like word frequency \citep{zeng2005text}.
 
-The recent CWI shared task at SemEval-2016 \citep{paetzold2016semeval} studied the annotations of 400 non-native speakers on English target words, labeled as either simple or complex. The SemEval-2018 CWI shared task \citep{yimam2018report} extended their study to data across four languages, while also introducing a probabilistic component to the binary classification task. This year's Lexical Complexity Prediction (LCP) shared task \citep{shardlow2021semeval} forgoes the treatment of word difficulty as a binary classification task \citep{paetzold2016semeval, yimam2018report} and instead measures degree of difficulty on a continuous scale. This choice is intriguing as it mitigates a dilemma with previous approaches of having to treat words close to a decision boundary (suppose a threshold deems a word's difficulty) identically to those that are far away, ie. extremely easy or extremely difficult.
+The recent CWI shared task at SemEval-2016 \citep{paetzold2016semeval} studied the annotations of 400 non-native speakers on English target words, labeled as either simple or complex. The SemEval-2018 CWI shared task \citep{yimam2018report} extended their study to data across four languages, while also introducing a probabilistic component to the binary classification task. This year's Lexical Complexity Prediction (LCP) shared task \citep{shardlow2021semeval} forgoes the treatment of word difficulty as a binary classification task \citep{paetzold2016semeval, yimam2018report} and instead measures degree of difficulty on a continuous scale. This choice is intriguing as it mitigates a dilemma with previous approaches that treat words close to a decision boundary (suppose a threshold decide a word's being `difficult') identically to those that are far away, ie. extremely easy or extremely difficult.
 
 Teams are asked to submit predictions on unlabeled test sets for two subtasks: predicting on English single word and multi word expressions (MWEs). The Pearson correlation coefficient is used to evaluate how closely submitted predictions associate with ground truth labels. For each subtask, \texttt{BigGreen} presents a machine learning-based approach that fuses the predictions of a feature engineering-based regressor with those of a feature learning-based deep neural network model founded on BERT \citep{devlin2018bert}. Our code is made fully available on GitHub.\footnote{\url{https://github.com/Aadil101/BigGreen-at-LCP-2021}}
 
@@ -186,7 +187,7 @@ Previous studies have looked at estimating the readability of a given text, thou
 
 \citet{shardlow2013comparison} tries a brute force approach where a simplification algorithm is applied to each word of a given text, deeming a word complex only if it is simplified. However, this suffers from the assumption that a non-complex word does not require further simplification. The author also tries assigning a familiarity score to the target word, and then determining whether the word is complex or not through the use of a threshold. We avoid thresholding our features in this study as we find it unnecessary, since raw familiarity scores can be used as features in regression-based tasks. 
 
-Results for the SemEval-2016 task \citep{zampieri2017complex} suggest that vote ensembling predictions of one's best performing models to be an effective strategy, while several top-performing models appear to use linguistic information beyond just word frequency \citep{paetzold2016sv000gg, ronzano2016taln, mukherjee2016ju_nlp}; they include lexical, semantic, syntactic, and psycholinguistic features. This inspires our use of ensemble techniques, as well us our consideration of phonological features as a new area of research. Moreover, \citet{zampieri2017complex} emphasize the recurring effectiveness of Decision Trees and Random Forests across top performing models, perhaps due to the integrality of features across various distinct categories (eg. morphological, syntactic, etc.) as opposed to features that are generally of a same particular category. Note that the success of tree-based approaches is based on the metric G-score (which measures the harmonic mean between Accuracy and Recall). Interestingly, tree-based approaches tend to be outperformed by simpler threshold-based strategies based on F1-score; namely, \citet{wrobel2016plujagh} learns over word frequencies (computed over Wikipedia-2014) a threshold that maximizes F1-score over the CWI training dataset. Finally, evident is the underperformance of neural network and/or word embedding models in competition, which is potentially explained by the limited size of the training data.
+Results for the SemEval-2016 task \citep{zampieri2017complex} suggest that vote ensembling predictions of one's best performing models to be an effective strategy, while several top-performing models appear to use linguistic information beyond just word frequency \citep{paetzold2016sv000gg, ronzano2016taln, mukherjee2016ju_nlp}; they include lexical, semantic, syntactic, and psycholinguistic features. This inspires our use of ensemble techniques, as well us our consideration of phonetic features as a new area of research. Moreover, \citet{zampieri2017complex} emphasize the recurring effectiveness of Decision Trees and Random Forests across top performing models, perhaps due to the integrality of features across various distinct categories (eg. morphological, syntactic, etc.) as opposed to features that are generally of a same particular category. Note that the success of tree-based approaches is based on the metric G-score (which measures the harmonic mean between Accuracy and Recall). Interestingly, tree-based approaches tend to be outperformed by simpler threshold-based strategies based on F1-score; namely, \citet{wrobel2016plujagh} learns over word frequencies (computed over Wikipedia-2014) a threshold that maximizes F1-score over the CWI training dataset. Finally, evident is the underperformance of neural network and/or word embedding models in competition, which is potentially explained by the limited size of the training data.
 
 Results from the SemEval-2018 task \citep{yimam2018report} show progress in CWI research with regards to cross-lingual prediction, demonstrated by successful modeling of lexical complexity on a per-language basis by numerous systems. Surprisingly, this does \textit{not} require models necessarily be trained on data in the language of interest; training upon data available in one or more foreign languages is sufficient for predicting upon an `unseen' language, perhaps suggesting the universality of certain predictors of lexical complexity. Feature engineering-based systems appear to outperform competing deep learning-based systems, despite the latter having generally better performances since the CWI shared task 2016. 
 
@@ -401,7 +402,7 @@ Finally, we notice that target words used rarely in language (eg. Samples 1, 3, 
   \caption{\label{fig:character_transition_probabilities} Lowercase ASCII transition probabilities, estimated over Gigaword.}
 \end{figure}
 
-While prior top-performing approaches harness a variety of linguistic information across lexical, semantic, syntactic, and psycholinguistic features \citep{paetzold2016sv000gg, ronzano2016taln, mukherjee2016ju_nlp}, there appears to be a lack of consideration of phonological features. \citet{hayden1950relative} suggests that the relative frequencies of phonemes can potentially be used to identify important phonemes to tutor foreign language students with who exhibit numerous phonemic difficulties. While we assume that each crowd annotator of CompLex understand at least one dialect of English, we also assume for convenience that they share similar literacy levels and general familiarity with the English language. We hypothesize that because certain English phonemes (ie. soundable segments or character n-grams) are evidently more common in usage than others \citep{hayden1950relative}, a target word's complexity could be impacted by an annotator's familiarity with its constituent phonemes.
+While prior top-performing approaches harness a variety of linguistic information across lexical, semantic, syntactic, and psycholinguistic features \citep{paetzold2016sv000gg, ronzano2016taln, mukherjee2016ju_nlp}, there appears to be a lack of consideration of phonetic features. \citet{hayden1950relative} suggests that the relative frequencies of phonemes can potentially be used to identify important phonemes to tutor foreign language students with who exhibit numerous phonemic difficulties. While we assume that each crowd annotator of CompLex understand at least one dialect of English, we also assume for convenience that they share similar literacy levels and general familiarity with the English language. We hypothesize that because certain English phonemes (ie. soundable segments or character n-grams) are evidently more common in usage than others \citep{hayden1950relative}, a target word's complexity could be impacted by an annotator's familiarity with its constituent phonemes.
 
 For a given target word $w$, consider the transition probability from character $w[i]$ to the character $w[i+1]$, that is, the expected probability of the $(i+1)$th character succeeding the $i$th character in language; we call this a \textit{character} transition probability. To understand whether this may be a useful feature for our task, for each target word $w$ of class $c$, we define the random variable ${}_xT_y \in \mathbb{N}$ as the number of occurences of character transition $x \rightarrow y$ in the target word, where $x, y \in \{\text{ASCII character set}\}$. For each possible transition $x \rightarrow y$, we ask whether the distribution of ${}_xT_y$ over class 1 samples (ie. very easy target words) is different from that over class 4, 5 samples (ie. difficult target words).\footnote{Here, we combine classes 4 and 5 because so few samples exist in each individual class.} Let $\mu_1$ and $\mu_{4,5}$ be the average number of occurences of the given transition $x \rightarrow y$ over  class 1 and class 4, 5 target words, respectively. We conduct an unpaired lower-tailed t-test using the null hypothesis that $H_0\text{: } \mu_1 = \mu_{4,5}$, and the alternative hypothesis that $H_a\text{: } \mu_1 < \mu_{4,5}$. Table \ref{tab:top_char_transitions} presents only the character transitions that yield statistically significant p-values at the 10\% confidence level, implying that these character transitions are slightly more common in higher complexity target words than in lower complexity target words. Note that we also conducted t-tests with instead the alternative hypothesis $H_a\text{: } \mu_1 > \mu_{4,5}$, finding that \textit{no} character transition yields a statistically significant p-value at the 10\% confidence level! 
 
@@ -560,7 +561,7 @@ We present performances of \texttt{BigGreen}'s system on each subtask in Tables 
     XGBoost$_\textit{reduced}$ &	0.7456 & - &	0.7157 &	0.0751 \\
     XGBoost$_{\textit{full}+\textit{reduced}}$ & 0.7576 & - & 0.7220 & 0.0646 \\
     MT-DNN & 0.7484 & -	& 0.7044 & 0.0664 \\
-    Ensemble (submission) & \textbf{0.7749} & 8 of 54 & \textbf{0.7294} & \textbf{0.0629} \\
+    Ensemble (submission) & \textbf{0.7749} & \textbf{8 of 54} & \textbf{0.7294} & \textbf{0.0629} \\
     \hline
     Best competition results & 0.7886 & & 0.7425 & 0.0609 \\ 
     \hline
@@ -572,8 +573,8 @@ We present performances of \texttt{BigGreen}'s system on each subtask in Tables 
   \centering
   \begin{tabular}{l|cccc}
     \hline \textbf{Model} & \textbf{Pearson} & \textbf{Rank} & \textbf{Spearman} & \textbf{MAE} \\ \hline
-    XGBoost$_{\textit{full}+\textit{reduced}}(\text{head})$ & 0.7164 & - & 0.7305 & 0.1281 \\
-    XGBoost$_{\textit{full}+\textit{reduced}}(\text{tail})$ & 0.7188 & - & 0.7416 & 0.1306 \\
+    XGBoost$_{\textit{full}+\textit{reduced}}$ (head) & 0.7164 & - & 0.7305 & 0.1281 \\
+    XGBoost$_{\textit{full}+\textit{reduced}}$ (tail) & 0.7188 & - & 0.7416 & 0.1306 \\
     MT-DNN & 0.7890 & - & 0.7649 & \textbf{0.0766} \\
     Ensemble (submission) & 0.7898 & 25 of 37 & 0.7769 & 0.0903 \\
     Ensemble (post-competition) & \textbf{0.8290} & \textbf{*14 of 37} & \textbf{0.8120} & 0.0857 \\
@@ -602,7 +603,7 @@ For the MWE subtask, performances are reported in Table \ref{tab:multi-word-resu
   \caption{\label{fig:xgboost_feature_importance} Feature importances for XGBoost$_\textit{full}$. Definitions of features are in Appendix \ref{appendix:descriptions}.}
 \end{figure}
 
-In total we consider 110 features, in addition to our multidimensional embedding-based features and $\log$-transformed features. We inspect the estimated feature importance scores produced by the XGBoost$_\textit{full}$ model to find that term frequency-based features (eg. unigrams, bigrams, trigrams) are of overwhelming importance (see Figure \ref{fig:xgboost_feature_importance}). This raises concern over whether the MT-DNN model too relies on term frequencies to make \textit{its} predictions, and if not, the linguistic features it may have learned upon fine-tuning. Of the remaining features having non-zero feature importances, most appear to be dimensions of a target word-based semantic feature (ie. GloVe or ELMo embeddings).
+In total we consider 110 features, in addition to our multidimensional embedding-based features and $\log$-transformed features. We inspect the estimated feature importance scores produced by the XGBoost$_\textit{full}$ model to find that term frequency-based features (eg. unigrams, bigrams, trigrams) are of overwhelming importance (see Figure \ref{fig:xgboost_feature_importance}). This raises concern over whether the MT-DNN model too relies on term frequencies to make \textit{its} predictions, and if not, the linguistic features it may have learned upon fine-tuning. Of the remaining features with non-zero feature importances (most of whom did not make the top-20 shown in Figure \ref{fig:xgboost_feature_importance}), most appear to be dimensions of a target word-based semantic feature (ie. GloVe or ELMo embeddings).
 
 \section{BERT Attention}
 \label{sec:bert_attention}
@@ -615,15 +616,46 @@ In total we consider 110 features, in addition to our multidimensional embedding
 
 \begin{figure}
   \centering
-  \includegraphics[scale=0.6]{head_3-9_tf_avg.png}
-  \caption{\label{fig:head_3-9_tf_avg} Word frequency vs. average head 3-9 attention weight directed to words of a random sample.}
+  \begin{subfigure}[b]{0.9\textwidth}
+     \includegraphics[width=1\linewidth]{head_3-9_tf_avg_1.png}
+     \caption{Test set sample 279}
+     \label{fig:head_3-9_tf_avg_1} 
+  \end{subfigure}\vspace{10mm}
+  
+  \begin{subfigure}[b]{0.9\textwidth}
+     \includegraphics[width=1\linewidth]{head_3-9_tf_avg_2.png}
+     \caption{Test set sample 334}
+     \label{fig:head_3-9_tf_avg_2}
+  \end{subfigure}\vspace{10mm}
+
+  \begin{subfigure}[b]{0.95\textwidth}
+    \includegraphics[width=1\linewidth]{head_3-9_tf_avg_3.png}
+    \caption{Test set sample 244}
+    \label{fig:head_3-9_tf_avg_3}
+  \end{subfigure}
+
+ \caption{\label{fig:head_3-9_tf_avg} Here, we consider three arbitrary test set samples: 279, 334, and 244. For each sample, we compute the word frequency of each word in the context, relative to the GBND corpus. For simplicity, we let the word frequency of a BPE be identical to the word frequency of the original word it was derived from. We then compute the average attention weight directed to each word in the context at head 3-9 (ie. layer 3, head 9 in Figure \ref{fig:head_correlations_tf}).}
 \end{figure}
 
 \begin{figure}
   \centering
-  \includegraphics[scale=0.8]{head_3-9.png}
-  \captionsetup{justification=centering}
-  \caption{\label{fig:head_3-9} Head 3-9 attention map for a random sample.}
+  \begin{subfigure}[b]{0.5\textwidth}
+    \includegraphics[width=1\linewidth]{head_3-9_1.png}
+    \caption{Test set sample 279}
+    \label{fig:head_3-9_1} 
+  \end{subfigure}%
+  \begin{subfigure}[b]{0.5\textwidth}
+    \includegraphics[width=1\linewidth]{head_3-9_2.png}
+    \caption{Test set sample 324}
+    \label{fig:head_3-9_2} 
+  \end{subfigure}\vspace{10mm}
+
+  \begin{subfigure}[b]{0.75\textwidth}
+    \includegraphics[width=1\linewidth]{head_3-9_3.png}
+    \caption{Test set sample 244}
+    \label{fig:head_3-9_3} 
+  \end{subfigure}\vspace{10mm}
+  \caption{\label{fig:head_3-9} Here, we once again study test set samples 279, 334, and 244. For each sample, we visualize the head 3-9 attention weight directed between any two BPEs in the context.}
 \end{figure}
 
 \begin{figure}
@@ -632,11 +664,11 @@ In total we consider 110 features, in addition to our multidimensional embedding
   \caption{\label{fig:attn_feature_importances} This figure will show a heatmap of attention head importances measured using a gradient-based approach.}
 \end{figure}
 
-Attention maps of Transformers have in previous works been assessed to demonstrate linguistic phenomena learned by specialized attention heads \citep{voita2019analyzing, clark2019does}, and to measure the relative contribution of each attention head to making task predictions \citep{voita2019analyzing, michel2019sixteen}. We extract attention maps from MT-DNN's underlying fine-tuned BERT architecture. For each sample in the single word test set, we obtain an attention map from each of the underlying shared text encoding layers' 144 total attention heads.
+Attention maps of Transformers have in previous works been assessed to expose linguistic phenomena learned by specialized attention heads \citep{voita2019analyzing, clark2019does}, and to measure the relative contribution of each attention head to making task predictions \citep{voita2019analyzing, michel2019sixteen}. We extract attention maps from MT-DNN's underlying fine-tuned BERT architecture. For each sample in the single word test set, we obtain an attention map from each of the underlying shared text encoding layers' 144 attention heads.
 
-Based on the precedence given to term frequency features by the XGBoost$_\textit{full}$ model, we hypothesize that for certain attention heads, the degree to which BPEs attend to one another varies relative to the token's rarity in the lexicon. This follows the findings of \citealp{voita2019analyzing}, who identify heads in which lesser frequent tokens are attended to semi-uniformly by a majority of sentence tokens. 
+Based on our prior findings regarding the importance of term frequency-based features to the performance of the XGBoost$_\textit{full}$ model, we hypothesize that at certain attention heads, the average attention given to BPEs varies relative to the parent word's rarity in lexicon. This follows the findings of \citealp{voita2019analyzing}, who identify heads at which lesser frequent tokens are attended to semi-uniformly by a majority of sentence tokens. 
 
-To test our hypothesis, we estimate for each attention head the Pearson correlation between word frequency and the average attention given to each word in the context.\footnote{We compute attention given to a \textit{word} as the sum of attention given to its constituent BPEs. We use the GBND corpus to extract word frequencies from, though any large corpora would suffice.} As illustrated in Figures \ref{fig:head_correlations_tf} and \ref{fig:head_3-9_tf_avg}, we find multiple attention heads appearing to specialize at directing attention towards the most or least frequent words (depending on sign of the correlation). Vertical stripe patterns like that in Figure \ref{fig:head_3-9} emerge as a result of attention originating from a spectrum of tokens. The findings seem to affirm the fundamental relevancy of word frequency to lexical complexity prediction, corroborating our intuitions.
+To test our hypothesis, we estimate for each attention head the Pearson correlation between word frequency and the average attention weight directed to each word in the context.\footnote{We compute attention given to a \textit{word} as the sum of attention weights given to its constituent BPEs. We use the GBND corpus to extract word frequencies from, though any large corpora would suffice.} As illustrated in Figures \ref{fig:head_correlations_tf}, we find multiple attention heads appearing to specialize at directing attention towards either the most or least (depending on sign of the correlation) frequent words in language. Vertical stripe patterns like that in Figure \ref{fig:head_3-9} emerge as a result of attention originating from a spectrum of tokens; note that any cell $(i,j)$ in an attention map represents the attention weight directed \textit{from} the $i$th token \textit{to} the $j$th token in the sentence. A shortcoming of this examination is that the specific roles played by tokens responsible for the vertical stripe patterns over particular tokens remains unclear. Nonetheless, these findings seem to affirm the fundamental relevancy of word frequency to lexical complexity prediction, corroborating our intuitions.
 
 This paragraph will discuss our interpretations of Figure \ref{fig:attn_feature_importances}.
 
@@ -861,11 +893,11 @@ Here, we describe in greater detail the various features that were experimented 
 \chapter{Model Hyperparameters}
 \label{appendix:hyperparameters}
 
-Here we provide optimized hyperparameter settings that may help future developers with reproducing results, namely with training our models.
+Here, we provide optimized hyperparameter settings that may help future developers with reproducing our results, namely for training our models.
 
 \section{XGBoost}
 
-Below are tuned parameters used for all of our XGBoost models. Parameters not listed are given their default values as specified in XGBoost documentation\footnote{\url{https://xgboost.readthedocs.io/en/latest/}}:
+Below are tuned parameters used for all of our XGBoost models. Parameters not listed are given their default values as specified in XGBoost documentation:\footnote{\url{https://xgboost.readthedocs.io/en/latest/}}
 
 \indent \texttt{colsample\_bytree}: 0.7\\
 \indent \texttt{learning\_rate}: 0.03\\
