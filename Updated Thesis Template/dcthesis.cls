@@ -142,18 +142,19 @@
         \@field \par
         by \par
         \@author \par
+        Advisor: Soroush Vosoughi \par
         \MakeUppercase{\@school} \par
         \@location \par
         \@date \par
         \vfill
-        \begin{tabular}[t]{cc}
-          & Examining Committee: \\
-          \phantom{\underline{\hspace{3in}}} & \@signatureline{\@advisor, Chair} \\
-          & \@signatureline{\@examinera} \\
-          & \@signatureline{\@examinerb} \\
-          & \@signatureline{\@examinerc} \\
-          %\multicolumn{2}{l}{\@longsignatureline{\@dean \par Dean of the Guarini School of Graduate and Advanced Studies}} \\
-        \end{tabular}
+        %\begin{tabular}[t]{cc}
+        %  & Examining Committee: \\
+        %  \phantom{\underline{\hspace{3in}}} & \@signatureline{\@advisor, Chair} \\
+        %  & \@signatureline{\@examinera} \\
+        %  & \@signatureline{\@examinerb} \\
+        %  & \@signatureline{\@examinerc} \\
+        %  %\multicolumn{2}{l}{\@longsignatureline{\@dean \par Dean of the Guarini School of Graduate and Advanced Studies}} \\
+        %\end{tabular}
 			\end{center}
     \end{doublespace}
     \newpage
